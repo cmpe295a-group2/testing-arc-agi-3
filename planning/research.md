@@ -1,3 +1,9 @@
+# ARC‑AGI‑3 — Team Research & Discussion Notes
+
+*SJSU CMPE 295A, Group 2 — the group's literature review, prior-art survey, and prototyping plan. Referenced as **research** in the [comparison](comparison.md).*
+
+---
+
 ARC-AGI-3 Overview:
 Create AI agent to play simple video game with no user input
 Must figure out rules, goal, and strategy by itself

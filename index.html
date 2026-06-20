@@ -3,183 +3,1569 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>ARC‑AGI‑3 Agent · SJSU CMPE 295A · Group 2</title>
-<meta name="description" content="Strategy, comparison and algorithm ranking for the ARC Prize 2026 — ARC-AGI-3 competition. SJSU CMPE 295A Group 2." />
+<title>ARC-AGI-3 · Competition &amp; Master Strategy Explainer</title>
 <style>
   :root{
-    --bg:#0a0e16; --surface:#141a26; --surface2:#1a2230; --elev:#202a3a;
+    --bg:#0a0e16; --bg2:#0e131d; --surface:#141a26; --surface2:#1a2230; --elev:#202a3a;
     --border:#26334a; --border2:#33425e;
     --txt:#e8eef7; --txt2:#9fb0c7; --txt3:#6f8198;
-    --teal:#2dd4bf; --violet:#8b7bf0; --amber:#f5b860; --blue:#5aa9f0; --green:#46c98b; --red:#f0726a;
-    --radius:16px; --radius-sm:10px;
+    --teal:#2dd4bf; --violet:#8b7bf0; --amber:#f5b860; --blue:#5aa9f0;
+    --green:#46c98b; --yellow:#f5cd5b; --red:#f0726a; --pink:#ef7fb0;
+    --radius:14px; --radius-sm:9px;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
-    --shadow:0 14px 40px rgba(0,0,0,.45);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:radial-gradient(1200px 720px at 78% -12%,#15203a 0%,var(--bg) 55%) fixed,var(--bg);
-    color:var(--txt);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;min-height:100vh}
+  body{margin:0;background:radial-gradient(1200px 700px at 78% -12%,#15203a 0%,var(--bg) 55%) fixed,var(--bg);
+    color:var(--txt);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;}
   a{color:var(--teal);text-decoration:none}
   a:hover{text-decoration:underline}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
   .mono{font-family:var(--mono)}
+  code{font-family:var(--mono);font-size:.9em;background:var(--surface2);border:1px solid var(--border);
+    padding:1px 6px;border-radius:6px;color:#cfe;white-space:nowrap}
 
-  /* hero */
-  header.hero{padding:64px 0 30px;border-bottom:1px solid var(--border)}
-  .brand{display:flex;align-items:center;gap:13px;margin-bottom:26px}
-  .logo{width:38px;height:38px;border-radius:9px;display:grid;grid-template-columns:repeat(3,1fr);gap:2.5px;padding:5px;
+  /* top bar */
+  header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,14,22,.82);border-bottom:1px solid var(--border)}
+  .topin{display:flex;align-items:center;gap:18px;height:60px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
+  .logo{width:30px;height:30px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:4px;
     background:linear-gradient(135deg,#1a2540,#101725);border:1px solid var(--border2)}
   .logo i{border-radius:2px;background:var(--surface2)}
   .logo i:nth-child(1){background:var(--teal)} .logo i:nth-child(5){background:var(--violet)} .logo i:nth-child(9){background:var(--amber)}
-  .brand .name{font-weight:600;letter-spacing:.2px}
-  .brand .name small{display:block;color:var(--txt3);font-size:12px;font-weight:400}
+  nav.tabs{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{appearance:none;border:0;background:transparent;color:var(--txt2);font:inherit;font-size:13.5px;
+    padding:8px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .tab:hover{color:var(--txt);background:var(--surface)}
+  .tab.active{color:var(--bg);background:var(--teal);font-weight:600}
+
+  section.panel{display:none;animation:fade .35s ease;padding-bottom:60px}
+  section.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* hero */
+  .hero{padding:54px 0 26px}
   .eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase}
-  h1{font-size:clamp(30px,5.4vw,52px);line-height:1.07;margin:12px 0 10px;font-weight:700;letter-spacing:-.5px}
+  h1{font-size:clamp(30px,5vw,52px);line-height:1.07;margin:14px 0 8px;font-weight:700;letter-spacing:-.5px}
   h1 .grad{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .sub{color:var(--txt2);font-size:18px;max-width:720px}
-  .thesis{margin:24px 0 0;padding:16px 22px;border-left:3px solid var(--violet);background:var(--surface);
-    border-radius:0 var(--radius) var(--radius) 0;font-size:16px}
+  .sub{color:var(--txt2);font-size:18px;max-width:820px}
+  .thesis{margin:26px 0 0;padding:18px 22px;border-left:3px solid var(--violet);background:var(--surface);
+    border-radius:0 var(--radius) var(--radius) 0;font-size:16.5px}
   .thesis b{color:var(--txt)}
   .metarow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
-  .chip{font-size:12.5px;color:var(--txt2);background:var(--surface);border:1px solid var(--border);padding:6px 12px;border-radius:999px}
+  .chip{font-size:12.5px;color:var(--txt2);background:var(--surface);border:1px solid var(--border);
+    padding:6px 11px;border-radius:999px}
   .chip b{color:var(--teal);font-weight:600}
 
-  /* sections */
-  main{padding:14px 0 70px}
-  .sec{margin-top:48px}
-  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
-  .sec-head h2{font-size:21px;margin:0}
-  .sec-head .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3)}
-  .sec p.lead{color:var(--txt2);margin:4px 0 20px;font-size:15px}
+  h2{font-size:26px;font-weight:700;margin:0 0 4px;letter-spacing:-.3px}
+  h3.blk{font-size:19px;font-weight:700;margin:34px 0 12px;letter-spacing:-.2px}
+  .lead{color:var(--txt2);font-size:16px;margin:0 0 22px;max-width:840px}
+  .sectionhead{margin:8px 0 24px}
+  .anchor{padding-top:30px}
 
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .cardlink{display:block;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--border);
-    border-radius:var(--radius);padding:22px 22px 20px;position:relative;overflow:hidden;transition:.18s;text-decoration:none;color:inherit}
-  .cardlink:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:var(--shadow);text-decoration:none}
-  .cardlink::after{content:"→";position:absolute;top:20px;right:22px;color:var(--txt3);font-size:20px;transition:.18s}
-  .cardlink:hover::after{color:var(--teal);transform:translate(3px,-2px)}
-  .cardlink .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-    padding:3px 9px;border-radius:6px;margin-bottom:12px}
-  .b-strategy{background:rgba(45,212,191,.14);color:var(--teal);border:1px solid rgba(45,212,191,.3)}
-  .b-analysis{background:rgba(139,123,240,.14);color:var(--violet);border:1px solid rgba(139,123,240,.3)}
-  .cardlink h3{margin:0 0 6px;font-size:18px;color:#fff;padding-right:26px}
-  .cardlink p{margin:0;color:var(--txt2);font-size:14px}
-  .cardlink .file{margin-top:13px;font-family:var(--mono);font-size:11.5px;color:var(--txt3)}
-  .cardlink.feature{grid-column:1/-1;background:linear-gradient(120deg,#16233c,#141a26 60%);border-color:var(--border2)}
-  .cardlink.feature h3{font-size:21px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 
-  /* source list */
-  .srcwrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px}
-  .srclist{display:grid;grid-template-columns:1fr 1fr;gap:2px}
-  .src{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:var(--radius-sm);transition:.14s;color:var(--txt2);font-size:14px}
-  .src:hover{background:var(--surface2);color:var(--txt);text-decoration:none}
-  .src .ext{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--amber);background:rgba(245,184,96,.12);
-    border:1px solid rgba(245,184,96,.28);padding:2px 6px;border-radius:5px;flex-shrink:0}
-  .src b{color:var(--txt);font-weight:500}
-  .src span.desc{color:var(--txt3);font-size:12.5px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+  .card h3{margin:0 0 6px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .card p{margin:0;color:var(--txt2);font-size:14.5px}
+  .card p+p{margin-top:9px}
+  .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-size:17px;flex:none;
+    background:var(--surface2);border:1px solid var(--border2)}
 
-  footer{border-top:1px solid var(--border);padding:26px 0 50px;color:var(--txt3);font-size:13px}
-  footer a{color:var(--txt2)}
-  footer .frow{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;align-items:center}
+  .fact{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px 16px 18px;position:relative;overflow:hidden}
+  .fact .n{position:absolute;right:12px;top:-2px;font-size:50px;font-weight:800;color:var(--surface2);font-family:var(--mono)}
+  .fact h3{font-size:15px;margin:0 0 4px;position:relative}
+  .fact p{font-size:13.5px;color:var(--txt2);margin:0;position:relative}
 
-  @media(max-width:760px){ .grid,.srclist{grid-template-columns:1fr} }
+  .callout{border-radius:var(--radius);padding:16px 20px;border:1px solid;display:flex;gap:14px;align-items:flex-start;margin:16px 0}
+  .callout .em{font-size:22px;line-height:1.2}
+  .callout div{font-size:14.5px}
+  .callout.warn{background:rgba(245,205,91,.07);border-color:rgba(245,205,91,.35)}
+  .callout.danger{background:rgba(240,114,106,.07);border-color:rgba(240,114,106,.32)}
+  .callout.tip{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.32)}
+  .callout.info{background:rgba(90,169,240,.07);border-color:rgba(90,169,240,.32)}
+  .callout b{color:var(--txt)}
+
+  .badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;font-family:var(--mono);white-space:nowrap;display:inline-block}
+  .b-ok{background:rgba(70,201,139,.16);color:var(--green)}
+  .b-test{background:rgba(245,205,91,.16);color:var(--yellow)}
+  .b-ext{background:rgba(240,114,106,.16);color:var(--red)}
+  .legendrow{display:flex;flex-wrap:wrap;gap:14px;margin:14px 0 4px;font-size:13px;color:var(--txt2)}
+  .legendrow span{display:flex;align-items:center;gap:7px}
+
+  /* tables */
+  .tbl{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface);
+    border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+  .tbl th{text-align:left;padding:11px 14px;background:var(--surface2);color:var(--txt2);font-weight:600;
+    font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  .tbl td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--txt2)}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl td b,.tbl td strong{color:var(--txt)}
+  .tbl tr:hover td{background:rgba(255,255,255,.015)}
+  .scrollx{overflow-x:auto}
+  .num{font-family:var(--mono);white-space:nowrap}
+
+  /* color palette */
+  .palette{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .swatch{width:46px;height:46px;border-radius:8px;display:grid;place-items:end center;font-size:10px;
+    font-family:var(--mono);color:rgba(255,255,255,.9);padding-bottom:2px;border:1px solid rgba(255,255,255,.12);
+    text-shadow:0 1px 2px rgba(0,0,0,.6)}
+
+  /* action keys */
+  .keys{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+  .key{display:flex;gap:13px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:13px 15px}
+  .keycap{min-width:54px;height:38px;padding:0 8px;border-radius:8px;display:grid;place-items:center;font-family:var(--mono);
+    font-weight:700;font-size:13px;background:linear-gradient(180deg,var(--elev),var(--surface2));
+    border:1px solid var(--border2);box-shadow:0 2px 0 var(--border2);flex:none;color:var(--txt)}
+  .key .kt{font-weight:600;font-size:14px}
+  .key .kd{color:var(--txt2);font-size:13px;margin-top:2px}
+
+  /* RHAE calculator */
+  .calc{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:820px){.calc{grid-template-columns:1fr}}
+  .ctrl{margin:0 0 20px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:14px;color:var(--txt2);margin-bottom:8px}
+  .ctrl label b{color:var(--txt);font-family:var(--mono)}
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;background:var(--surface2);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--bg)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--bg)}
+  .readout{display:flex;align-items:baseline;gap:10px;margin:4px 0 2px}
+  .readout .big{font-size:46px;font-weight:800;font-family:var(--mono)}
+  .readout .lbl{color:var(--txt2);font-size:14px}
+  .statline{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .stat{flex:1;min-width:120px;background:var(--surface2);border-radius:var(--radius-sm);padding:11px 13px}
+  .stat .k{font-size:12px;color:var(--txt3)}
+  .stat .v{font-size:20px;font-weight:700;font-family:var(--mono);margin-top:2px}
+  .curvebox{background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-top:6px}
+  .formula{font-family:var(--mono);font-size:15px;background:var(--surface2);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:14px 16px;color:#cfe;overflow-x:auto;margin:14px 0}
+
+  /* works / fails */
+  .col h3.colh{font-size:16px;display:flex;align-items:center;gap:9px;margin:0 0 12px}
+  .item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:10px}
+  .item .t{font-weight:600;font-size:14.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .item .d{color:var(--txt2);font-size:13.5px;margin-top:5px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+  /* ranking */
+  .rank{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:9px;overflow:hidden}
+  .rank .row{display:grid;grid-template-columns:34px 1fr 150px 60px;gap:12px;align-items:center;padding:13px 16px}
+  @media(max-width:680px){.rank .row{grid-template-columns:30px 1fr 60px}.rank .role{display:none}}
+  .rank .rk{font-family:var(--mono);font-weight:800;font-size:18px;color:var(--txt3);text-align:center}
+  .rank .nm{font-weight:600;font-size:14.5px}
+  .rank .nm small{display:block;color:var(--txt3);font-weight:400;font-size:12.5px;margin-top:2px}
+  .rank .role{font-size:12.5px;color:var(--txt2)}
+  .fitbar{position:relative;height:26px;border-radius:7px;background:var(--surface2);overflow:hidden;display:grid;place-items:center}
+  .fitbar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+  .fitbar span{position:relative;font-family:var(--mono);font-weight:700;font-size:13px}
+
+  /* timeline / phases */
+  .phase{display:flex;gap:16px;padding:0 0 4px}
+  .ptrack{display:flex;flex-direction:column;align-items:center;flex:none}
+  .pnode{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-weight:700;
+    font-size:13px;background:var(--surface2);border:2px solid var(--border2);color:var(--txt)}
+  .pline{width:2px;flex:1;background:var(--border2);margin:4px 0}
+  .pbody{padding-bottom:22px;flex:1}
+  .pbody h4{margin:3px 0 4px;font-size:16px}
+  .pbody .when{font-size:12px;color:var(--teal);font-family:var(--mono);font-weight:600}
+  .pbody p{margin:6px 0 0;color:var(--txt2);font-size:14px}
+  .pbody .exit{margin-top:8px;font-size:13px;color:var(--txt3)}
+  .pbody .exit b{color:var(--green)}
+
+  ul.clean{margin:8px 0;padding-left:20px;color:var(--txt2);font-size:14.5px}
+  ul.clean li{margin:6px 0}
+  ul.clean li b{color:var(--txt)}
+
+  .footer{border-top:1px solid var(--border);margin-top:30px;padding:26px 0 50px;color:var(--txt3);font-size:13px}
+  .footer a{color:var(--txt2)}
+
+  .pillrow{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+  .pill{font-size:12.5px;padding:5px 11px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);color:var(--txt2)}
+
+  .tag{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;background:var(--surface2);border:1px solid var(--border);color:var(--txt2)}
+  .win{color:var(--teal);font-weight:600}
+  hr.soft{border:0;border-top:1px solid var(--border);margin:30px 0}
+  .kicker{color:var(--txt3);font-size:13px;letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin:30px 0 10px}
+</style>
+
+<!-- ===== scoped styles for the Comparison panel (namespaced under .cmp) ===== -->
+<style>
+  .cmp{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --ink:#e6edf3; --muted:#9da7b3;
+    --line:#2d3744; --accent:#58a6ff; --gold:#f5b301; --silver:#c4ccd6; --bronze:#cd7f4d;
+    --s:#7ee787; --a:#58a6ff; --b:#d2a8ff; --c:#f0883e; --d:#ff7b72;
+    --master:#58a6ff; --p4:#d2a8ff; --green:#3fb950; --red:#ff7b72;
+    --shadow:0 8px 28px rgba(0,0,0,.45);
+    color:var(--ink); font-size:15.5px; line-height:1.65;
+  }
+  .cmp a{color:var(--accent); text-decoration:none}
+  .cmp a:hover{text-decoration:underline}
+  .cmp .hero{text-align:center; padding:8px 0 24px; border-bottom:1px solid var(--line);
+    background:radial-gradient(700px 240px at 50% -30px,rgba(88,166,255,.13),transparent); margin-bottom:6px}
+  .cmp .hero .tag{display:inline-block; font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--accent); background:transparent; border:1px solid var(--line); border-radius:999px; padding:5px 14px; margin-bottom:14px; white-space:normal}
+  .cmp .hero h1{margin:0 0 12px; font-size:clamp(24px,4vw,38px); line-height:1.15; font-weight:800;
+    background:linear-gradient(92deg,#fff,#9fcbff); -webkit-background-clip:text; background-clip:text; color:transparent; letter-spacing:-.3px}
+  .cmp .hero p{margin:6px 0; color:var(--muted); font-size:15px}
+  .cmp .crumb{margin-top:14px; font-size:13px}
+  .cmp nav.toc{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:24px 0 8px}
+  .cmp nav.toc a{font-size:13px; color:var(--muted); border:1px solid var(--line);
+    padding:7px 13px; border-radius:8px; background:var(--panel); transition:.15s}
+  .cmp nav.toc a:hover{color:#fff; border-color:var(--accent); transform:translateY(-1px); text-decoration:none}
+  .cmp section{margin-top:48px; scroll-margin-top:78px}
+  .cmp h2{font-size:23px; margin:0 0 6px; padding-bottom:10px; border-bottom:1px solid var(--line); color:var(--ink); font-weight:700; letter-spacing:-.2px}
+  .cmp h2 .num{color:var(--accent); font-variant-numeric:tabular-nums; margin-right:10px; font-family:var(--sans); background:none; border:0; padding:0}
+  .cmp h3{font-size:18px; margin:28px 0 10px; color:#fff; font-weight:700}
+  .cmp p{color:#cdd6e0; margin:0 0 12px}
+  .cmp .lead{font-size:16px; color:#b9c3cf}
+  .cmp ul.clean{padding-left:20px; margin:8px 0} .cmp ul.clean li{margin:7px 0; color:#cdd6e0}
+  .cmp code{font-family:var(--mono); background:#11161f; border:1px solid var(--line); border-radius:5px; padding:1px 6px; font-size:13px; color:#ffd9a8; white-space:nowrap}
+
+  .cmp .callout{display:block; background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--accent);
+    border-radius:10px; padding:16px 20px; margin:22px 0; box-shadow:var(--shadow); font-size:14.5px}
+  .cmp .callout ul{margin:10px 0 0; padding-left:20px} .cmp .callout li{margin:5px 0}
+  .cmp .callout.gold{border-left-color:var(--gold)}
+  .cmp .callout.green{border-left-color:var(--green)}
+  .cmp .callout.red{border-left-color:var(--red)}
+  .cmp .callout.p4{border-left-color:var(--p4)}
+  .cmp .callout strong{color:#fff}
+
+  .cmp .podium{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:26px 0}
+  .cmp .pcard{background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid var(--line);
+    border-radius:14px; padding:18px 16px; position:relative; overflow:hidden}
+  .cmp .pcard .rk{font-size:12px; font-weight:700; letter-spacing:.05em; color:var(--muted)}
+  .cmp .pcard h4{margin:8px 0 4px; font-size:15px; color:#fff; word-break:break-word}
+  .cmp .pcard .score{font-size:34px; font-weight:800; margin:6px 0 2px}
+  .cmp .pcard .of{font-size:12px; color:var(--muted)}
+  .cmp .pcard .note{font-size:12px; color:#aeb8c4; margin-top:8px; line-height:1.4}
+  .cmp .pcard.first{border-color:var(--gold); box-shadow:0 0 0 1px rgba(245,179,1,.35),var(--shadow)}
+  .cmp .pcard.first .score{color:var(--gold)}
+  .cmp .pcard.second .score{color:var(--silver)}
+  .cmp .pcard.third .score{color:var(--bronze)}
+  .cmp .pcard.fourth .score{color:var(--p4)}
+  .cmp .pcard .medal{position:absolute; top:12px; right:14px; font-size:20px}
+
+  .cmp table{width:100%; border-collapse:collapse; margin:18px 0; font-size:14px;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px; overflow:hidden}
+  .cmp caption{caption-side:top; text-align:left; color:var(--muted); font-size:13px; padding:0 0 8px}
+  .cmp th,.cmp td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top}
+  .cmp th{background:#11161f; color:#fff; font-weight:700; font-size:13px; text-transform:none; letter-spacing:0}
+  .cmp th.m{color:#bcd9ff} .cmp th.p{color:#e3ccff}
+  .cmp tr:last-child td{border-bottom:none}
+  .cmp tbody tr:hover{background:#1a2130}
+  .cmp td.c,.cmp th.c{text-align:center}
+  .cmp .totalrow{background:#11161f; font-weight:700} .cmp .totalrow td{color:#fff}
+  .cmp .win{color:var(--s); font-weight:600}
+
+  .cmp .badge{display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px; color:#0d1117; font-family:var(--sans); white-space:nowrap}
+  .cmp .b-s{background:var(--s)} .cmp .b-a{background:var(--a)} .cmp .b-b{background:var(--b)} .cmp .b-c{background:var(--c)} .cmp .b-d{background:var(--d)}
+  .cmp .b-green{background:var(--green)} .cmp .b-red{background:var(--red)}
+  .cmp .src{font-size:11px; color:var(--muted); white-space:nowrap}
+
+  .cmp .fit{display:flex; align-items:center; gap:8px; min-width:120px}
+  .cmp .fit .bar{flex:1; height:7px; background:#222b38; border-radius:99px; overflow:hidden}
+  .cmp .fit .bar i{display:block; height:100%; border-radius:99px}
+  .cmp .fit .v{font-variant-numeric:tabular-nums; font-weight:700; width:24px; text-align:right; font-size:13px}
+
+  .cmp .tierhead{display:flex; align-items:center; gap:10px; margin:30px 0 6px}
+  .cmp .tierhead .chip{font-weight:800; font-size:14px; padding:3px 12px; border-radius:8px; color:#0d1117; background:var(--surface2); border:0}
+  .cmp .tierhead .desc{color:var(--muted); font-size:14px}
+
+  .cmp .scoregrid{margin:18px 0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--panel)}
+  .cmp .srow{display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:center; padding:11px 16px; border-bottom:1px solid var(--line)}
+  .cmp .srow:last-child{border-bottom:none}
+  .cmp .srow .cname{font-size:13.5px; color:#dbe3ec}
+  .cmp .srow .cname small{display:block; color:var(--muted); font-size:11px}
+  .cmp .bars{display:flex; flex-direction:column; gap:6px}
+  .cmp .brow{display:flex; align-items:center; gap:8px}
+  .cmp .brow .lab{width:62px; font-size:11px; color:var(--muted); text-align:right}
+  .cmp .brow .track{flex:1; height:9px; background:#222b38; border-radius:99px; overflow:hidden}
+  .cmp .brow .track i{display:block; height:100%; border-radius:99px}
+  .cmp .brow .val{width:22px; font-size:12px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums}
+  .cmp .legend{display:flex; gap:18px; justify-content:flex-end; padding:10px 16px; font-size:12px; color:var(--muted)}
+  .cmp .legend span{display:inline-flex; align-items:center; gap:6px}
+  .cmp .dot{width:10px; height:10px; border-radius:3px; display:inline-block}
+
+  .cmp .fork{margin:24px 0; text-align:center}
+  .cmp .fork .top{display:inline-block; background:linear-gradient(180deg,#22272e,#161b22); border:1px solid var(--line);
+    border-radius:12px; padding:14px 22px; font-weight:700; color:#fff; box-shadow:var(--shadow)}
+  .cmp .fork .top small{display:block; font-weight:400; color:var(--muted); font-size:12px; margin-top:3px}
+  .cmp .fork .stem{width:2px; height:26px; background:var(--line); margin:0 auto}
+  .cmp .branches{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:6px}
+  .cmp .branch{border:1px solid var(--line); border-radius:12px; padding:18px; text-align:left; background:var(--panel)}
+  .cmp .branch.green{border-color:rgba(63,185,80,.5); box-shadow:0 0 0 1px rgba(63,185,80,.15)}
+  .cmp .branch.red{border-color:rgba(255,123,114,.5); box-shadow:0 0 0 1px rgba(255,123,114,.15)}
+  .cmp .branch .head{display:flex; align-items:center; gap:8px; font-weight:800; margin-bottom:6px}
+  .cmp .branch.green .head{color:var(--green)} .cmp .branch.red .head{color:var(--red)}
+  .cmp .branch .owner{font-size:12px; color:var(--muted); margin-bottom:10px}
+  .cmp .branch ul{margin:0; padding-left:18px} .cmp .branch li{font-size:13px; margin:5px 0; color:#c6cfda}
+
+  .cmp .grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .cmp .mini{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px}
+  .cmp .mini.m{border-top:3px solid var(--master)} .cmp .mini.p{border-top:3px solid var(--p4)}
+  .cmp .mini h4{margin:0 0 8px; font-size:14px; color:#fff}
+  .cmp .mini ul{margin:0; padding-left:18px} .cmp .mini li{font-size:13.5px; margin:5px 0; color:#c2cbd6}
+
+  @media(max-width:820px){
+    .cmp .podium{grid-template-columns:1fr 1fr}
+    .cmp .grid2,.cmp .branches{grid-template-columns:1fr}
+    .cmp .srow{grid-template-columns:1fr}
+    .cmp .scrollx{overflow-x:auto}
+  }
+</style>
+
+<!-- ===== scoped styles for the Repo Guide panel (namespaced under .fld) ===== -->
+<style>
+  .fld{ --gray:#7f8da3; color:var(--txt); font-size:15.5px; line-height:1.65; }
+  .fld a{color:var(--teal);text-decoration:none} .fld a:hover{text-decoration:underline}
+  .fld .mono{font-family:var(--mono)}
+  .fld .hero{padding:8px 0 22px}
+  .fld .eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  .fld h1{font-size:clamp(26px,4.4vw,40px);line-height:1.12;margin:13px 0 10px;font-weight:700;letter-spacing:-.4px}
+  .fld h1 .grad{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fld .sub{color:var(--txt2);font-size:17px;max-width:780px}
+  .fld .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .fld .lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt2);background:var(--surface);border:1px solid var(--border);padding:5px 11px;border-radius:999px}
+  .fld .lg b{width:9px;height:9px;border-radius:3px;display:inline-block}
+  .fld h2{font-size:23px;font-weight:700;margin:38px 0 4px;letter-spacing:-.3px;color:var(--txt)}
+  .fld .lead{color:var(--txt2);font-size:15.5px;margin:0 0 20px;max-width:800px}
+  .fld .explorer{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+  .fld .tree{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;font-family:var(--mono);font-size:13px}
+  .fld .node{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:7px;cursor:pointer;color:var(--txt2);white-space:nowrap;transition:.12s}
+  .fld .node:hover{background:var(--surface2);color:var(--txt)}
+  .fld .node.on{background:rgba(45,212,191,.12);color:var(--teal)}
+  .fld .node .em{flex:none;width:16px;text-align:center}
+  .fld .node .nm{overflow:hidden;text-overflow:ellipsis}
+  .fld .node .dotb{width:7px;height:7px;border-radius:50%;flex:none;margin-left:auto}
+  .fld .ind1{padding-left:22px} .fld .ind2{padding-left:40px} .fld .ind3{padding-left:58px}
+  .fld .grp{color:var(--txt3);font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:10px 9px 4px}
+  .fld .detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;min-height:340px}
+  .fld .detail .dpath{font-family:var(--mono);font-size:13px;color:var(--txt3);word-break:break-all}
+  .fld .detail h3{font-size:21px;margin:8px 0 6px;font-weight:700;color:var(--txt)}
+  .fld .detail .badge{display:inline-block;font-size:12px;font-weight:600;padding:4px 11px;border-radius:7px;margin-bottom:14px;font-family:var(--sans);white-space:normal}
+  .fld .detail p{color:var(--txt2);font-size:15px;margin:0 0 12px}
+  .fld .detail ul{margin:0 0 14px;padding-left:0;list-style:none}
+  .fld .detail li{color:var(--txt2);font-size:14.5px;padding:5px 0 5px 24px;position:relative}
+  .fld .detail li:before{content:"›";position:absolute;left:6px;top:4px;color:var(--teal);font-weight:700}
+  .fld .detail li b{color:var(--txt)}
+  .fld .compbox{margin-top:6px;border-radius:var(--radius-sm);padding:13px 15px;font-size:13.5px;border:1px solid}
+  .fld .compbox.keep{background:rgba(70,201,139,.07);border-color:rgba(70,201,139,.3);color:#bfe9d3}
+  .fld .compbox.kill{background:rgba(240,114,106,.07);border-color:rgba(240,114,106,.3);color:#f3c2bf}
+  .fld .compbox.note{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.3);color:#bdeae3}
+  .fld .compbox b{color:#fff}
+  .fld .badge.keep{background:rgba(70,201,139,.16);color:var(--green)}
+  .fld .badge.kill{background:rgba(240,114,106,.16);color:var(--red)}
+  .fld .badge.lib{background:rgba(45,212,191,.16);color:var(--teal)}
+  .fld .badge.game{background:rgba(139,123,240,.16);color:var(--violet)}
+  .fld .badge.cfg{background:rgba(127,141,163,.16);color:var(--gray)}
+  .fld .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .fld .fstep{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 15px;position:relative}
+  .fld .fstep .fn{font-family:var(--mono);font-size:12px;color:var(--teal)}
+  .fld .fstep .ft{font-weight:600;font-size:14.5px;margin:4px 0 4px}
+  .fld .fstep .fd{color:var(--txt2);font-size:13px}
+  .fld .farrow{display:flex;align-items:center;color:var(--txt3);font-size:22px;padding:0 6px}
+  .fld .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(235px,1fr))}
+  .fld .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:17px 19px}
+  .fld .card h3{margin:0 0 6px;font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:9px;color:var(--txt)}
+  .fld .card p{margin:0;color:var(--txt2);font-size:14px}
+  .fld .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex:none;background:var(--surface2);border:1px solid var(--border2)}
+  .fld .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  @media(max-width:780px){
+    .fld .explorer{grid-template-columns:1fr}
+    .fld .farrow{transform:rotate(90deg);justify-content:center;width:100%;padding:4px 0}
+  }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="wrap">
+<header class="top">
+  <div class="wrap topin">
     <div class="brand">
       <div class="logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div class="name">arc‑agi‑3‑agent<small>SJSU CMPE 295A · Group 2</small></div>
+      ARC&#8209;AGI&#8209;3
     </div>
-    <div class="eyebrow">ARC Prize 2026 · ARC‑AGI‑3</div>
-    <h1>Building an agent that <span class="grad">plays games it has never seen</span></h1>
-    <p class="sub">Strategy, head‑to‑head comparisons, and a full algorithm ranking for the offline, $700K ARC‑AGI‑3 competition — where the goal is never stated and the agent must explore, model, infer, and plan in a single life.</p>
-    <div class="thesis"><b>The thesis:</b> ARC‑AGI‑3 is a search‑and‑planning problem wearing the costume of a perception problem — and because the games ship as deterministic, in‑process Python objects, the environment can serve as its own perfect simulator.</div>
-    <div class="metarow">
-      <span class="chip"><b>Offline</b> · no internet at inference</span>
-      <span class="chip"><b>RHAE</b> · efficiency = (h/a)² squared</span>
-      <span class="chip"><b>25</b> public / <b>55</b> private (scored)</span>
-      <span class="chip"><b>9 h</b> · single RTX 6000</span>
-      <span class="chip"><a href="https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3">Kaggle competition ↗</a></span>
-    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-p="overview">Overview</button>
+      <button class="tab" data-p="rules">Game Rules</button>
+      <button class="tab" data-p="scoring">Scoring (RHAE)</button>
+      <button class="tab" data-p="games">The 25 Games</button>
+      <button class="tab" data-p="repo">Repo Guide</button>
+      <button class="tab" data-p="strategy">Strategy</button>
+      <button class="tab" data-p="comparison">Comparison</button>
+      <button class="tab" data-p="plan">Build Plan</button>
+    </nav>
   </div>
 </header>
 
 <main class="wrap">
 
-  <!-- STRATEGY -->
-  <section class="sec">
-    <div class="sec-head"><span class="kicker">01</span><h2>The Strategy</h2></div>
-    <p class="lead">The team's single source of truth and its interactive walkthrough.</p>
-    <a class="cardlink feature" href="planning/ARC_AGI_3_MASTER_STRATEGY.html">
-      <span class="badge b-strategy">Master Strategy</span>
-      <h3>Competition &amp; Master Strategy Explainer</h3>
-      <p>The full plan: forward‑model search using <span class="mono">deepcopy(_game)</span> as a free, exact simulator; object‑centric perception; win‑condition inference; the Day‑1 go/no‑go probe; an 8‑paradigm algorithm ranking; a fork‑structured execution roadmap and 9‑row risk register.</p>
-      <div class="file">planning/ARC_AGI_3_MASTER_STRATEGY.html</div>
-    </a>
-    <div class="grid" style="margin-top:18px">
-      <a class="cardlink" href="planning/ARC_AGI_3_STRATEGY.html">
-        <span class="badge b-strategy">Interactive</span>
-        <h3>Master Strategy — Tabbed View</h3>
-        <p>The same strategy as a tabbed, single‑page interactive explainer — browse the overview, mechanics, research, ranking and roadmap by tab.</p>
-        <div class="file">planning/ARC_AGI_3_STRATEGY.html</div>
-      </a>
-      <a class="cardlink" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/ARC_AGI_3_MASTER_STRATEGY.md">
-        <span class="badge b-strategy">Markdown</span>
-        <h3>Master Strategy — Source</h3>
-        <p>The underlying Markdown document with evidence tags (✅ verified · 🧪 confirm Day‑1 · ⚠️ external), the 25‑env appendix, and full sources. Renders on GitHub.</p>
-        <div class="file">planning/ARC_AGI_3_MASTER_STRATEGY.md</div>
-      </a>
-    </div>
-  </section>
+<!-- ===================== OVERVIEW ===================== -->
+<section class="panel active" id="overview">
+  <div class="hero">
+    <div class="eyebrow">ARC Prize 2026 · Kaggle · Offline</div>
+    <h1>Cracking <span class="grad">ARC&#8209;AGI&#8209;3</span><br/>a game with no instructions.</h1>
+    <p class="sub">An agent is dropped into a never-before-seen, turn-based grid game with <b>zero instructions</b>.
+      It must explore the controls, figure out the dynamics, <b>infer the goal on its own</b>, then solve every
+      level efficiently — in a single life, fully offline. This page explains the competition, the game rules,
+      the scoring, and the team's master strategy for winning it.</p>
 
-  <!-- COMPARISON & RANKING -->
-  <section class="sec">
-    <div class="sec-head"><span class="kicker">02</span><h2>Comparison &amp; Ranking</h2></div>
-    <p class="lead">How the candidate plans stack up, and every algorithm ranked by fitness to ARC‑AGI‑3.</p>
-    <div class="grid">
-      <a class="cardlink" href="planning/ALGORITHM_COMPARISON_AND_RANKING.html">
-        <span class="badge b-analysis">Analysis</span>
-        <h3>Algorithm Comparison &amp; Ranking</h3>
-        <p>Four strategy documents scored head‑to‑head on an 8‑criterion rubric, plus a unified master ranking of ~30 algorithms across Tiers S→D — with podium, scorecards and fitness bars.</p>
-        <div class="file">planning/ALGORITHM_COMPARISON_AND_RANKING.html</div>
-      </a>
-      <a class="cardlink" href="planning/PLAN4_VS_MASTER_STRATEGY.html">
-        <span class="badge b-analysis">Head‑to‑Head</span>
-        <h3>plan_4 vs Master Strategy</h3>
-        <p>A focused duel: the literature‑grounded plan_4 against the source‑grounded Master Strategy — and why they are the two complementary halves of the Day‑1 fork (94 vs 60).</p>
-        <div class="file">planning/PLAN4_VS_MASTER_STRATEGY.html</div>
-      </a>
+    <div class="thesis">
+      <b>The thesis in one sentence:</b> ARC&#8209;AGI&#8209;3 is a <b>search-and-planning</b> problem wearing the
+      costume of a <b>perception</b> problem — and because the games ship as deterministic, in-process Python
+      objects, the environment can serve as its own perfect simulator, turning <i>"the goal is never told"</i>
+      into <i>"the goal is detectable in a free rollout."</i>
     </div>
-  </section>
 
-  <!-- SOURCE PLANS -->
-  <section class="sec">
-    <div class="sec-head"><span class="kicker">03</span><h2>Source Plans</h2></div>
-    <p class="lead">The candidate plans behind the comparison (Markdown, rendered on GitHub).</p>
-    <div class="srcwrap">
-      <div class="srclist">
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/plan_1.md"><span class="ext">MD</span><span><b>plan_1</b> — <span class="desc">Object‑centric state‑graph portfolio (25 algos)</span></span></a>
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/plan_2.md"><span class="ext">MD</span><span><b>plan_2</b> — <span class="desc">Executable world model + planner (26 algos)</span></span></a>
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/plan_3.md"><span class="ext">MD</span><span><b>plan_3</b> — <span class="desc">LLM‑driven program synthesis (5 algos)</span></span></a>
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/plan_4.md"><span class="ext">MD</span><span><b>plan_4</b> — <span class="desc">Literature review &amp; 4‑prototype scoping</span></span></a>
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/ARC_AGI_3_MASTER_STRATEGY.md"><span class="ext">MD</span><span><b>Master Strategy</b> — <span class="desc">The committed plan</span></span></a>
-        <a class="src" href="https://github.com/cmpe295a-group2/testing-arc-agi-3/blob/main/planning/ALGORITHM_COMPARISON_AND_RANKING.md"><span class="ext">MD</span><span><b>Comparison &amp; Ranking</b> — <span class="desc">The full write‑up</span></span></a>
+    <div class="metarow">
+      <span class="chip"><b>$700K</b> Grand Prize</span>
+      <span class="chip"><b>Offline</b> · no internet at inference</span>
+      <span class="chip"><b>9 h</b> on one RTX 6000 (48 GB)</span>
+      <span class="chip"><b>135</b> games · &gt;1000 levels</span>
+      <span class="chip">Humans <b>100%</b> · best LLM <b>&lt;1%</b></span>
+      <span class="chip">Team: <b>SJSU CMPE 295A, Group 2</b></span>
+    </div>
+  </div>
+
+  <div class="legendrow">
+    <span><span class="badge b-ok">&#10003; verified</span> from the source/wheels or the official report</span>
+    <span><span class="badge b-test">&#129514; confirm Day&#8209;1</span> strongly indicated, needs runtime check</span>
+    <span><span class="badge b-ext">&#9888; external</span> third-party claim, not source-verifiable here</span>
+  </div>
+
+  <h3 class="blk">The five facts that dictate everything</h3>
+  <div class="grid g3">
+    <div class="fact"><div class="n">1</div><h3>It runs offline</h3>
+      <p>No internet at inference. Every LLM template in the starter repo (OpenAI / LangGraph / smolagents) is
+      <b>dead weight</b> — the games run fully locally via bundled Python wheels.</p></div>
+    <div class="fact"><div class="n">2</div><h3>Efficiency is squared</h3>
+      <p>Per level <span class="mono">S = min(1.15, (h/a)&#178;)</span> — human actions over agent actions,
+      <b>squared</b> — but gated by a <b>completion cap</b>. Completion is the dominant lever.</p></div>
+    <div class="fact"><div class="n">3</div><h3>The goal is never stated</h3>
+      <p>No language, numbers, or icons — only Core-Knowledge priors (objectness, geometry, physics, agentness).
+      Win conditions must be <b>discovered by interaction</b>.</p></div>
+    <div class="fact"><div class="n">4</div><h3>LLMs lose; search wins</h3>
+      <p>Frontier LLMs score &lt;1%; humans solve 100%. The bottleneck is <b>strategy / exploration</b>, not
+      perception. Non-LLM agents lead the benchmark.</p></div>
+    <div class="fact"><div class="n">5</div><h3>The eval is intentionally OOD</h3>
+      <p>25 public / 55 semi-private / <b>55 fully-private</b> (the scored set). Overfitting to the public games
+      is futile — only <b>engine-level generality</b> transfers.</p></div>
+  </div>
+
+  <h3 class="blk">The competition contract</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><td><b>Submission</b></td><td>Kaggle Notebook, <b>no internet</b> at inference time</td></tr>
+    <tr><td><b>Compute</b></td><td>&#8804; <b>9 hours</b>, single <b>RTX 6000 (Ada, 48 GB)</b>-class GPU</td></tr>
+    <tr><td><b>Datasets</b></td><td>25 public demo · 55 semi-private · <b>55 fully-private (scored)</b> · &gt;1000 levels total</td></tr>
+    <tr><td><b>Observation</b></td><td>One or more <b>64&#215;64 grids</b>, each cell &#8712; {0..15} (16 colors); a frame may be a short animation sequence</td></tr>
+    <tr><td><b>Actions</b></td><td><code>RESET</code> + <code>ACTION1..5</code> (keys) + <code>ACTION6</code> (click x,y &#8712; 0..63) + <code>ACTION7</code> (undo) — each game uses a <b>subset</b></td></tr>
+    <tr><td><b>Win condition</b></td><td>Complete <b>all levels</b> (&#8805; 6 per env; level 1 is an easy tutorial); difficulty grows by <b>composition</b></td></tr>
+    <tr><td><b>Prizes</b></td><td><b>$700K</b> Grand (first to 100%) · <b>$75K</b> Top Score · <b>$75K</b> Milestones (Jun 30 &amp; Sep 30 2026)</td></tr>
+    <tr><td><b>License</b></td><td>Winners open-source under <b>CC0 / MIT-0</b></td></tr>
+    <tr><td><b>Status quo</b> <span class="badge b-ext">&#9888;</span></td><td>Humans 100% · Opus 4.6 0.50% · Gemini 3.1 Pro 0.40% · GPT 5.4 0.20% · Grok 4.20 0.10%. Preview community: non-LLM CNN <b>12.58%</b>, state-graph agent 6.71%, LLMs ~3&#8211;4%</td></tr>
+  </table>
+  </div>
+
+  <h3 class="blk">What the agent must do, in order</h3>
+  <div class="grid g4">
+    <div class="card"><h3><span class="ic">&#128270;</span>1 · Explore</h3><p>Interact to learn which keys/clicks do what, and which are even legal this frame.</p></div>
+    <div class="card"><h3><span class="ic">&#129518;</span>2 · Model</h3><p>Build a model of the dynamics — how objects move, collide, and transform.</p></div>
+    <div class="card"><h3><span class="ic">&#127919;</span>3 · Infer the goal</h3><p>Discover the unstated win condition from behavior alone (what flips to the next level).</p></div>
+    <div class="card"><h3><span class="ic">&#9889;</span>4 · Plan &amp; execute</h3><p>Find and run a near-optimal action sequence — once — on the scored instance.</p></div>
+  </div>
+</section>
+
+<!-- ===================== GAME RULES ===================== -->
+<section class="panel" id="rules">
+  <div class="sectionhead">
+    <div class="eyebrow">Section 1</div>
+    <h2>Games &amp; environments</h2>
+    <p class="lead">ARC&#8209;AGI&#8209;3 consists of hand-crafted interactive environments that test abstraction and
+      reasoning. Each game presents a unique challenge the agent must <b>explore</b>, <b>understand</b>, and
+      <b>solve</b> — with no instructions, in a single life, offline.</p>
+  </div>
+
+  <h3 class="blk">How games work</h3>
+  <div class="grid g2">
+    <div class="card"><h3><span class="ic">🧾</span>Frames in, actions out</h3>
+      <p>The agent receives <b>frames</b> — JSON objects holding the current game state and metadata — and responds with
+      <b>actions</b> to interact with the environment.</p></div>
+    <div class="card"><h3><span class="ic">🟦</span>The grid</h3>
+      <p>Each frame includes a grid (max <b>64&#215;64</b>) with integer cell values <code>0&#8211;15</code> representing
+      different states/colors, using a <code>(0,0)</code> <b>top-left</b> coordinate system.</p></div>
+    <div class="card"><h3><span class="ic">🪜</span>Multiple levels</h3>
+      <p>Each game has <b>multiple levels</b> of increasing difficulty. Level 1 is an easy tutorial; later levels grow
+      harder by <b>composing</b> earlier mechanics.</p></div>
+    <div class="card"><h3><span class="ic">🎯</span>The goal is hidden</h3>
+      <p>The win condition is <b>never stated</b>. The agent must discover what each game wants purely through
+      interaction — not from any text or label.</p></div>
+  </div>
+
+  <p class="lead" style="margin:22px 0 10px">The 16 cell values (<code>0&#8211;15</code>). Color is just an
+    object/identity cue — each color's meaning is game-specific and must be learned:</p>
+  <div class="palette" id="palette"></div>
+
+  <h3 class="blk">Game states</h3>
+  <p class="lead" style="margin-bottom:14px">At any moment a game is in one of three states:</p>
+  <div class="grid g3">
+    <div class="card"><h3><span class="badge b-test">NOT_FINISHED</span></h3>
+      <p>The game is still in progress — keep playing. (A fresh game reads <code>NOT_PLAYED</code> until the first
+      <code>RESET</code>.)</p></div>
+    <div class="card"><h3><span class="badge b-ok">WIN</span></h3>
+      <p>All levels completed — the game is solved. The honest progress signal is <code>levels_completed</code>
+      ticking up; there is no score text on screen.</p></div>
+    <div class="card"><h3><span class="badge b-ext">GAME_OVER</span></h3>
+      <p>A terminal / losing state was reached. In a single-life run this can end the attempt.</p></div>
+  </div>
+
+  <h3 class="blk">Available actions</h3>
+  <p class="lead" style="margin-bottom:14px">Agents interact using up to <b>7 actions</b>. Each game defines which are
+    available and what they do — and each frame ships an <code>available_actions</code> list, the per-frame
+    <b>legal-action filter</b>. The meaning of every action varies per game and must be discovered through exploration.</p>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>Action</th><th>Description</th></tr>
+    <tr><td><code>RESET</code></td><td>Start or restart the game</td></tr>
+    <tr><td><code>ACTION1 &#8211; ACTION5</code></td><td>Simple actions (e.g. move up / down / left / right, interact)</td></tr>
+    <tr><td><code>ACTION6</code></td><td>Complex action requiring <code>(x, y)</code> coordinates — a <b>4096-wide</b> click branch (<code>x,y &#8712; 0..63</code>)</td></tr>
+    <tr><td><code>ACTION7</code></td><td>An additional simple action (in the engine it often maps to undo / step-back, usable as a cheap state restore)</td></tr>
+  </table>
+  </div>
+  <p style="color:var(--txt2);font-size:14px;margin-top:14px">Internally the engine even knows which cells are
+    <i>meaningfully</i> clickable (<code>_get_valid_clickable_actions()</code>), but <b>this oracle is never exposed</b> —
+    taming the 4096-wide click branch is on us.</p>
+
+  <h3 class="blk">The hardest rule: the goal is <i>never</i> stated</h3>
+  <div class="callout info">
+    <div class="em">🧠</div>
+    <div>The games give you <b>only Core-Knowledge priors</b> — the innate concepts a human child has:
+    <b>objectness</b>, <b>geometry &amp; topology</b>, <b>basic physics</b>, and <b>agentness</b> (something on screen
+    is "you"). There is deliberately <b>no language, no numbers, no icons</b>. The win condition can only be inferred
+    by observing which interactions advance a level versus end the game.</div>
+  </div>
+
+  <h3 class="blk">Public &amp; private games</h3>
+  <div class="callout warn">
+    <div class="em">🔒</div>
+    <div>A set of <b>public games</b> is available for development and practice at
+    <a href="https://arcprize.org">arcprize.org</a>, plus the <b>25</b> public game files in the
+    <code>environment_files/</code> folder. Competition evaluation uses a separate, <b>private set of 110 games</b> the
+    agent has never seen — <b>half</b> score the <b>Public Leaderboard</b>, the other half the <b>Private
+    Leaderboard</b>. Overfitting the public games is futile; only engine-level generality transfers.</div>
+  </div>
+
+  <h3 class="blk">Scoring, in one line</h3>
+  <p class="lead">Agents are scored on <b>completion</b> (how many levels) and <b>efficiency</b> (agent actions vs a
+    human baseline). Per-level score = <code>min(human / agent, 1.0)</code> then <b>squared</b> (0.5 &#8594; 0.25);
+    per-game = weighted average by level index; total = average across games — a <b>0&#8211;100%</b> score.
+    <a href="#" data-goto="scoring">See the interactive Scoring (RHAE) breakdown &#8594;</a></p>
+
+  <h3 class="blk">The framework &amp; SDK</h3>
+  <div class="grid g2">
+    <div class="card"><h3><span class="ic">🧰</span>ARC-AGI toolkit</h3>
+      <p>The <code>arc_agi</code> Python package is the core toolkit for interacting with ARC&#8209;AGI&#8209;3
+      environments — shipped offline as wheels in <code>arc_agi_3_wheels/</code>.</p></div>
+    <div class="card"><h3><span class="ic">🤖</span>Agent architecture</h3>
+      <p>An agent implements two core methods:</p>
+      <p><code>is_done(frames, latest_frame)</code> — decide whether to stop playing.<br>
+      <code>choose_action(frames, latest_frame)</code> — pick the next action given the current state.</p></div>
+    <div class="card"><h3><span class="ic">🐝</span>Swarm</h3>
+      <p>A <b>Swarm</b> orchestrates multiple agent instances across all available games in parallel.</p></div>
+    <div class="card"><h3><span class="ic">🔄</span>Agent lifecycle</h3>
+      <p>1 · Get the list of available games &nbsp;·&nbsp; 2 · Open a scorecard (tracks performance) &nbsp;·&nbsp;
+      3 · For each game, <code>RESET</code> then act by strategy &nbsp;·&nbsp; 4 · Close the scorecard when all games
+      are complete.</p></div>
+  </div>
+
+  <h3 class="blk">Files</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>Path</th><th>What it is</th></tr>
+    <tr><td><code>ARC-AGI-3-Agents/</code></td><td>A local copy of the ARC-AGI-3-Agents repo (the agent framework)</td></tr>
+    <tr><td><code>arc_agi_3_wheels/</code></td><td>Package wheels for installing ARC&#8209;AGI&#8209;3 offline</td></tr>
+    <tr><td><code>environment_files/</code></td><td>The 25 public game files</td></tr>
+  </table>
+  </div>
+
+  <div class="callout tip" style="margin-top:18px">
+    <div class="em">🔓</div>
+    <div>The decisive detail for our strategy: each game is a <b>deterministic in-process Python object</b>
+    (<code>arcengine.ARCBaseGame</code>) with <b>no RNG in the engine core</b>. Clone the live game and you get a
+    <b>free, exact simulator</b> to search before committing a single scored move. That determinism is the whole
+    opening — more in <a href="#" data-goto="strategy">Strategy</a>.</div>
+  </div>
+</section>
+
+<!-- ===================== SCORING ===================== -->
+<section class="panel" id="scoring">
+  <div class="sectionhead">
+    <div class="eyebrow">Section 2</div>
+    <h2>Scoring &#8212; RHAE</h2>
+    <p class="lead">Score = <b>Relative Human-Action Efficiency</b>. You're measured against how many actions a human
+      needed for the same level &#8212; and the penalty for wandering is <b>squared</b>. But raw efficiency is capped
+      by how much of the game you actually finished.</p>
+  </div>
+
+  <div class="formula">
+  per-level&nbsp;&nbsp;S = min(1.15, (h / a)&#178;)        # h = human/baseline actions, a = agent actions
+  completion_cap = (&#931; weights of completed levels) / (&#931; all weights),  w&#8343; = level_index
+  env_score      = min(completion_cap, weighted_avg of per-level S)
+  total          = mean(env_score over all games)
+  </div>
+
+  <div class="grid g3" style="margin-bottom:8px">
+    <div class="card"><h3><span class="ic">&#10134;</span>Completion dominates</h3>
+      <p>Level weight <code>w&#8343; = l</code> (the level index), so <b>finishing a later level is worth more</b> than
+      shaving actions off an earlier one. A failed late level zeroes all the weight behind it.</p></div>
+    <div class="card"><h3><span class="ic">&#178;</span>Efficiency is squared</h3>
+      <p>Use <b>2&#215;</b> the human actions &#8594; score <b>25%</b>. Use <b>10&#215;</b> &#8594; just <b>1%</b>.
+      Trial-and-error is exactly what <code>(h/a)&#178;</code> punishes hardest.</p></div>
+    <div class="card"><h3><span class="ic">&#127937;</span>You can beat a human</h3>
+      <p>The cap is <b>1.15 (115%)</b> &#8212; act <i>more</i> efficiently than the human baseline and you bank a small
+      bonus, but you can never bank efficiency you didn't earn through completion.</p></div>
+  </div>
+
+  <div class="callout warn">
+    <div class="em">&#9888;&#65039;</div>
+    <div><b>Completion is the lever you can't fake.</b> Partial competence decays <b>multiplicatively</b> across 6&#8211;10
+    sequential levels. The build order is therefore always: <b>complete first, optimize actions second.</b></div>
+  </div>
+
+  <h3 class="blk">Try it: the RHAE calculator</h3>
+  <p class="lead" style="margin-bottom:16px">Drag the sliders to feel the squared penalty and the completion cap.
+    The left model is a single level; the right shows a whole game of <span id="lvlcount">6</span> levels.</p>
+
+  <div class="card" style="padding:22px 24px">
+   <div class="calc">
+    <div>
+      <div class="kicker" style="margin-top:0">Single level</div>
+      <div class="ctrl">
+        <label>Human / baseline actions &nbsp;<b id="hOut">20</b></label>
+        <input type="range" id="hIn" min="2" max="200" value="20" />
+      </div>
+      <div class="ctrl">
+        <label>Your agent's actions &nbsp;<b id="aOut">20</b></label>
+        <input type="range" id="aIn" min="1" max="600" value="20" />
+      </div>
+      <div class="readout"><span class="big" id="sOut" style="color:var(--teal)">100%</span><span class="lbl">level score S = min(1.15, (h/a)&#178;)</span></div>
+      <div class="statline">
+        <div class="stat"><div class="k">ratio a / h</div><div class="v" id="ratioOut">1.0&#215;</div></div>
+        <div class="stat"><div class="k">raw (h/a)&#178;</div><div class="v" id="rawOut">1.00</div></div>
       </div>
     </div>
+    <div>
+      <div class="kicker" style="margin-top:0">Whole game · completion cap</div>
+      <div class="ctrl">
+        <label>Levels completed (of 6) &nbsp;<b id="cOut">6</b></label>
+        <input type="range" id="cIn" min="0" max="6" value="6" />
+      </div>
+      <div class="ctrl">
+        <label>Avg efficiency on solved levels &nbsp;<b id="eOut">100%</b></label>
+        <input type="range" id="eIn" min="1" max="115" value="100" />
+      </div>
+      <div class="readout"><span class="big" id="envOut" style="color:var(--violet)">100%</span><span class="lbl">env score = min(cap, weighted&nbsp;avg)</span></div>
+      <div class="statline">
+        <div class="stat"><div class="k">completion cap</div><div class="v" id="capOut">100%</div></div>
+        <div class="stat"><div class="k">weight banked</div><div class="v" id="wOut">21/21</div></div>
+      </div>
+    </div>
+   </div>
+   <div class="curvebox" style="margin-top:18px">
+     <canvas id="curve" width="900" height="220" style="width:100%;height:200px"></canvas>
+     <div style="color:var(--txt3);font-size:12px;text-align:center;margin-top:4px">
+       Level score vs. action ratio a/h &#8212; the squared falloff. Dot = your current single-level setting.</div>
+   </div>
+  </div>
+
+  <h3 class="blk">A concrete read</h3>
+  <ul class="clean">
+    <li><b>Match the human (a = h):</b> S = 1.0 &#8594; full credit for that level.</li>
+    <li><b>Double the human (a = 2h):</b> S = (1/2)&#178; = <b>0.25</b>. Already a 75% haircut.</li>
+    <li><b>The "miracle solve" at the action limit (a = 5h):</b> S = (1/5)&#178; = <b>0.04</b> &#8212; why brute-force RL,
+      which burns actions to learn, is structurally doomed here.</li>
+    <li><b>Finish 5 of 6 levels but miss the last:</b> completion cap = (1+2+3+4+5)/(1+2+3+4+5+6) = 15/21 = <b>71%</b>
+      &#8212; a hard ceiling no efficiency can lift.</li>
+  </ul>
+</section>
+
+<!-- ===================== THE 25 GAMES ===================== -->
+<section class="panel" id="games">
+  <div class="sectionhead">
+    <div class="eyebrow">Section 3 · Appendix A</div>
+    <h2>The 25 public environments</h2>
+    <p class="lead">These ship as standalone, <b>obfuscated</b> Python (random identifiers) so the rules can't simply be
+      read &#8212; the agent must learn each by interaction. They are <b>dev + held-out validation</b> only, never a
+      training target. Eight have been reverse-engineered (<span class="badge b-ok">&#10003; analyzed</span>); their win
+      conditions are below.</p>
+  </div>
+
+  <h3 class="blk">The 8 reverse-engineered games</h3>
+  <div class="grid g2">
+    <div class="card"><h3><code>bp35</code> <span class="tag">platformer</span></h3>
+      <p><b>Gravity platformer.</b> Win = the avatar reaches the gem tile. <span class="badge b-ext">&#9888;</span> Opus 0% with &amp; without a harness — genuinely hard. 9 levels, keyboard+click.</p></div>
+    <div class="card"><h3><code>cd82</code> <span class="tag">pattern</span></h3>
+      <p><b>Geometry / pattern reconstruction</b> by directional paint. Win = the canvas matches a target (off-diagonal). The smallest game; 6 levels.</p></div>
+    <div class="card"><h3><code>lf52</code> <span class="tag">sliding-block</span></h3>
+      <p><b>Sokoban / sliding-block match.</b> Has <b>unseeded global <code>np.random</code></b> in <code>__init__</code> &#8594; must use <code>deepcopy</code>, never replay-from-RESET. 10 levels, click-only.</p></div>
+    <div class="card"><h3><code>ls20</code> <span class="tag">attribute match</span></h3>
+      <p><b>Object-attribute matching</b> &#8212; the canonical game in the technical report (Fig 2/3). L1 win-by-chance = 1/355; L7 adds fog; search depth ~190. 7 levels, keyboard.</p></div>
+    <div class="card"><h3><code>re86</code> <span class="tag">assembly</span></h3>
+      <p><b>Polyomino assembly.</b> Win = pixel-match to a goal shape (report Fig 4 RHAE example). L7 reaches depth ~424. 8 levels.</p></div>
+    <div class="card"><h3><code>tn36</code> <span class="tag">transform</span></h3>
+      <p><b>Object transform</b> (rigid + scale + recolor) to match a ghost target. Clicks act as program-selector buttons plus object cells. 7 levels, click.</p></div>
+    <div class="card"><h3><code>tr87</code> <span class="tag">grammar / tape</span></h3>
+      <p><b>Tape / grammar rewrite.</b> Per-level <i>seeded</i> RNG (safe under copy). <span class="badge b-ext">&#9888;</span> Opus 0% &#8594; 97.1% with a handcrafted "Duke" harness — which does <b>not</b> transfer to its sibling. 6 levels.</p></div>
+    <div class="card"><h3><code>vc33</code> <span class="tag">physics</span></h3>
+      <p><b>Physics</b> with a per-level gravity vector. Win = an internal <code>next_level()</code> predicate. Report: L6 ~50 actions vs L1 &lt;5. 7 levels, click.</p></div>
+  </div>
+
+  <h3 class="blk">All 25 environments</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>id</th><th>fps</th><th>control</th><th>~levels</th><th>notes (&#10003; = analyzed)</th></tr>
+    <tr><td><b>ar25</b></td><td class="num">6</td><td>keyboard_click</td><td class="num">8</td><td></td></tr>
+    <tr><td><b class="win">bp35</b></td><td class="num">20</td><td>keyboard_click</td><td class="num">9</td><td>&#10003; gravity platformer; win = avatar reaches gem; Opus 0% (hard)</td></tr>
+    <tr><td><b class="win">cd82</b></td><td class="num">30</td><td>keyboard_click</td><td class="num">6</td><td>&#10003; smallest; pattern reconstruction by paint; win = canvas matches target</td></tr>
+    <tr><td><b>cn04</b></td><td class="num">5</td><td>keyboard_click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>dc22</b></td><td class="num">15</td><td>keyboard_click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>ft09</b></td><td class="num">8</td><td>(none)</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>g50t</b></td><td class="num">30</td><td>keyboard</td><td class="num">7</td><td></td></tr>
+    <tr><td><b>ka59</b></td><td class="num">10</td><td>keyboard_click</td><td class="num">7</td><td>largest file (831 KB)</td></tr>
+    <tr><td><b class="win">lf52</b></td><td class="num">30</td><td>click</td><td class="num">10</td><td>&#10003; sokoban/sliding-block; unseeded global np.random &#8594; deepcopy-only</td></tr>
+    <tr><td><b>lp85</b></td><td class="num">20</td><td>click</td><td class="num">8</td><td></td></tr>
+    <tr><td><b class="win">ls20</b></td><td class="num">30</td><td>keyboard</td><td class="num">7</td><td>&#10003; canonical (report Fig2/3); attribute match; L1 P(win)=1/355; L7 fog; depth ~190</td></tr>
+    <tr><td><b>m0r0</b></td><td class="num">7</td><td>keyboard_click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>r11l</b></td><td class="num">30</td><td>click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b class="win">re86</b></td><td class="num">25</td><td>keyboard_click</td><td class="num">8</td><td>&#10003; polyomino assembly; win = pixel-match; report Fig4; L7 depth ~424</td></tr>
+    <tr><td><b>s5i5</b></td><td class="num">15</td><td>click</td><td class="num">8</td><td></td></tr>
+    <tr><td><b>sb26</b></td><td class="num">30</td><td>keyboard_click</td><td class="num">8</td><td></td></tr>
+    <tr><td><b>sc25</b></td><td class="num">20</td><td>keyboard_click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>sk48</b></td><td class="num">30</td><td>keyboard_click</td><td class="num">8</td><td></td></tr>
+    <tr><td><b>sp80</b></td><td class="num">10</td><td>keyboard_click</td><td class="num">6</td><td></td></tr>
+    <tr><td><b>su15</b></td><td class="num">20</td><td>click</td><td class="num">9</td><td></td></tr>
+    <tr><td><b class="win">tn36</b></td><td class="num">3</td><td>click</td><td class="num">7</td><td>&#10003; object transform (rigid+scale+recolor) to match ghost</td></tr>
+    <tr><td><b class="win">tr87</b></td><td class="num">10</td><td>keyboard</td><td class="num">6</td><td>&#10003; tape/grammar rewrite; seeded RNG (safe); Opus 0%&#8594;97.1% w/ "Duke" harness</td></tr>
+    <tr><td><b>tu93</b></td><td class="num">30</td><td>keyboard_click</td><td class="num">9</td><td></td></tr>
+    <tr><td><b class="win">vc33</b></td><td class="num">20</td><td>click</td><td class="num">7</td><td>&#10003; physics (per-level gravity); win = next_level() predicate; L6 ~50 vs L1 &lt;5</td></tr>
+    <tr><td><b>wa30</b></td><td class="num">5</td><td>keyboard</td><td class="num">9</td><td></td></tr>
+  </table>
+  </div>
+
+  <div class="callout danger">
+    <div class="em">&#9940;</div>
+    <div><b>Do not overfit to these.</b> The scored set is 55 <i>fully-private</i> games on the identical engine.
+    Memorized action sequences score 0 on unseen games (the <code>tr87</code> &#8594; 97.1% harness gives its sibling
+    <code>bp35</code> exactly <b>zero</b>). Only <b>engine-level</b> structure &#8212; the shared grid, 7-action space,
+    collision/<code>next_level</code> semantics, and <code>available_actions</code> filter &#8212; transfers.</div>
+  </div>
+</section>
+
+<!-- ===================== STRATEGY ===================== -->
+<section class="panel" id="strategy">
+  <div class="sectionhead">
+    <div class="eyebrow">Section 4</div>
+    <h2>The winning strategy</h2>
+    <p class="lead">Build a general <b>forward-model search agent</b>: segment each frame into objects, clone the live
+      game to get a free exact simulator, search that clone to discover the goal and a near-optimal path, then execute
+      <b>only</b> that path on the scored instance.</p>
+  </div>
+
+  <h3 class="blk">The exploit, in four moves</h3>
+  <div class="grid g4">
+    <div class="card"><h3><span class="ic">&#129528;</span>Segment</h3><p>Connected-component segmentation over the 64&#215;64&#215;16 grid &#8594; objects, the agent token, adjacency &amp; containment.</p></div>
+    <div class="card"><h3><span class="ic">&#128203;</span>Clone</h3><p><code>copy.deepcopy(arc_env._game)</code> &#8594; a perfect, in-process simulator. Steps on the clone are <b>free and unscored</b>.</p></div>
+    <div class="card"><h3><span class="ic">&#127919;</span>Search</h3><p>Search the clone &#8212; novelty for goal discovery, an inferred win-condition heuristic for efficiency &#8212; until a rollout fires <code>levels_completed</code>.</p></div>
+    <div class="card"><h3><span class="ic">&#9889;</span>Execute</h3><p>Run <b>only</b> the discovered near-optimal sequence on the real, scored instance. Nothing else touches the scorecard.</p></div>
+  </div>
+
+  <div class="callout tip" style="margin-top:18px">
+    <div class="em">&#128161;</div>
+    <div>This is the <b>only</b> paradigm that converts ARC&#8209;AGI&#8209;3's defining obstacle &#8212; "the goal is
+    never told" &#8212; into a <b>checkable</b> objective (detect <code>levels_completed</code> in a rollout), and it
+    attacks <b>both</b> scoring levers at once: completion via search, near-optimal action counts via the exact model.
+    It generalizes to OOD mechanics <b>by construction</b> — it searches the actual rules, so there is nothing to overfit.</div>
+  </div>
+
+  <h3 class="blk">The one decisive fork &#8212; the Day-1 gate</h3>
+  <div class="callout warn">
+    <div class="em">&#128721;</div>
+    <div>The whole plan hinges on a single unverified fact: <b>does the real Kaggle grader hand us the live
+    <code>_game</code> object to <code>deepcopy</code>, or only a frozen <code>step()</code>?</b> It is
+    <span class="badge b-ok">&#10003;</span> code-verified on the shipped wheels but <span class="badge b-test">&#129514;</span>
+    not yet confirmed on the grader. So Phase 1 is a ~30-line go/no-go probe:
+    <b style="color:var(--green)">GREEN</b> &#8594; forward-model search is the primary engine and the path to 100%.
+    <b style="color:var(--red)">RED</b> &#8594; pivot to the learned-world-model + CNN fallback immediately.
+    <i>Never ship the perfect simulator as the sole engine.</i></div>
+  </div>
+
+  <h3 class="blk">What works &#8212; and what doesn't</h3>
+  <div class="grid g2">
+    <div class="col">
+      <h3 class="colh"><span class="dot" style="background:var(--green)"></span>Works (build these)</h3>
+      <div class="item"><div class="t">A · Forward-model planning <span class="badge b-test">fit 82</span></div><div class="d">Env as its own perfect simulator. The primary engine: searches the actual rules, attacks both scoring levers, generalizes by construction.</div></div>
+      <div class="item"><div class="t">B · Object-centric perception + state graph <span class="badge b-ext">6.71%</span></div><div class="d">CC segmentation + canonical frame-hash dedup + dead-end/cycle detection. The supporting front-end (Blind Squirrel-style).</div></div>
+      <div class="item"><div class="t">C · Small local CNN aide <span class="badge b-ext">12.58%</span></div><div class="d">16-ch one-hot &#8594; conv torso + per-action heads + a 64&#215;64 coordinate head. Scores clicks cheaply; the GPU fallback policy if <code>_game</code> is sealed.</div></div>
+      <div class="item"><div class="t">D · Go-Explore / novelty (archive only)</div><div class="d">Return-to-state is exact &amp; free via deepcopy; language-free novelty drives goal discovery. Keep the archive, drop the RL phase.</div></div>
+    </div>
+    <div class="col">
+      <h3 class="colh"><span class="dot" style="background:var(--red)"></span>Doesn't work (avoid)</h3>
+      <div class="item"><div class="t">Pure LLM / VLM agents <span class="badge b-ext">&lt;1%</span></div><div class="d">Mechanically impossible offline, empirically dead at the frontier, and the bottleneck is search not perception. Real-world linguistic priors actively mislead on abstract grids.</div></div>
+      <div class="item"><div class="t">Learned world models (Dreamer/MuZero) <span class="badge b-test">fit 18</span></div><div class="d">Why approximate the transition function when <code>deepcopy</code> <i>is</i> it? Sample-hungry; model error is fatal under squared efficiency.</div></div>
+      <div class="item"><div class="t">Model-free deep RL (PPO/DQN/&#8230;) <span class="badge b-test">fit 8</span></div><div class="d">Needs 10&#8309;&#8211;10&#8312; steps vs a tens-to-hundreds single-life budget; every learning step burns scored actions; no reward to bootstrap.</div></div>
+      <div class="item"><div class="t">Overfitting the 25 public games</div><div class="d">The dominant trap. Solution-level handcrafting scores 0 on siblings; only engine-level generality transfers.</div></div>
+    </div>
+  </div>
+
+  <h3 class="blk">Algorithm ranking</h3>
+  <p class="lead" style="margin-bottom:14px">Decisive but conditional on the Day-1 fact. The stack is designed so each
+    engine degrades gracefully into the next. <span style="color:var(--txt3)">"Fit" = the team's 0&#8211;100 suitability score.</span></p>
+  <div id="ranks"></div>
+
+  <div class="callout info" style="margin-top:22px">
+    <div class="em">&#128202;</div>
+    <div>Want the full picture? The <b><a href="#" data-goto="comparison">Comparison</a></b> tab ranks all four
+    strategy documents (<code>master_plan</code>, <code>plan_1</code>, <code>plan_2</code>, <code>research</code>)
+    head-to-head and merges every algorithm above into a unified ~30-entry master ranking (Tiers S&#8594;D).</div>
+  </div>
+</section>
+
+<!-- ===================== BUILD PLAN ===================== -->
+<section class="panel" id="plan">
+  <div class="sectionhead">
+    <div class="eyebrow">Sections 4&#8211;5</div>
+    <h2>Baselines &amp; execution plan</h2>
+    <p class="lead">An executable build order. Each baseline is useful alone <b>and</b> becomes a reusable component of
+      the winning stack. Build in order; each gates the next.</p>
+  </div>
+
+  <h3 class="blk">The baselines (B&#8722;1 &#8594; B3)</h3>
+  <div class="grid g2">
+    <div class="card" style="border-color:rgba(245,205,91,.35)"><h3><span class="ic">&#128270;</span>B&#8722;1 · Simulability probe</h3>
+      <p><b>Day 1, before any planner code.</b> ~30 lines: <code>deepcopy</code> the game, step the copy, assert the
+      original frame &amp; scorecard are unchanged, verify two clones stay byte-identical. Run on all 25 games.
+      <b>Resolves the GREEN/RED fork.</b></p></div>
+    <div class="card"><h3><span class="ic">&#127922;</span>B0 · Random sanity agent</h3>
+      <p>End-to-end plumbing: load each env in OFFLINE mode, drive the loop, read <code>FrameData</code>, compute local
+      RHAE. <b>Critical fix:</b> raise the dangerous <code>MAX_ACTIONS=80</code> default to per-level <code>5&#183;h</code>.
+      Expected score &#8776; 0%.</p></div>
+    <div class="card"><h3><span class="ic">&#129517;</span>B1 · Novelty-greedy explorer</h3>
+      <p>Frame-change + novelty scoring over an archive of canonical frame-hashes; <b>one click per object centroid</b>
+      instead of 4096 raw clicks; no-op detection by frame equality. The perception substrate every later baseline
+      reuses; the mandatory fallback if the probe fails.</p></div>
+    <div class="card"><h3><span class="ic">&#127795;</span>B2 · Forward-model BFS / IDDFS</h3>
+      <p>The core thesis in code: deepcopy the game, search until a rollout ticks <code>levels_completed</code>, execute
+      only that path. Near-cap RHAE on narrow-branch games. <b>The big jump.</b> Provably stalls on depth-~400 levels
+      &#8594; why B3 exists.</p></div>
+    <div class="card" style="grid-column:1/-1;border-color:rgba(45,212,191,.35)"><h3><span class="ic">&#127919;</span>B3 · Best-first search + learned win-condition detection</h3>
+      <p>Defeats the depth wall + sparse reward. A <b>heuristic = inferred win-condition distance</b> (pixel-match,
+      pose-match, or reach-match, auto-detected per frame &#8212; never hardcoded) plus <b>subgoal decomposition</b> turns
+      one ~400-deep search into many &#8804;30-deep ones. Reuses B1's perception, B2's free simulator, and a tiny
+      classifier that learns which on-screen object is the target. <b>The credible path to 100% on simulable envs.</b></p></div>
+  </div>
+
+  <h3 class="blk">The six winning ideas</h3>
+  <div class="grid g3">
+    <div class="card"><h3>1 · Perfect-simulator planner</h3><p>Treat <code>_game</code> as its own oracle; search on free deepcopies, execute the near-optimal path. Highest-ceiling idea; load-bearing on the Day-1 probe.</p></div>
+    <div class="card"><h3>2 · General win-condition inference</h3><p>Never read the obfuscated source. Infer the goal from <code>levels_completed</code> + frame-diff; classify the env's match-type and plug the right heuristic.</p></div>
+    <div class="card"><h3>3 · Object-centric abstraction</h3><p>Plan in object space, not pixels. Collapses branching, supplies the canonical hash for cycle detection, encodes the only priors the games use.</p></div>
+    <div class="card"><h3>4 · Click-target pruning</h3><p>Reconstruct the never-exposed clickable oracle: propose clicks only at object centroids, validate on the simulator. 4096 &#8594; a handful.</p></div>
+    <div class="card"><h3>5 · Action-effect CNN</h3><p>GPU heuristic that orders candidate actions/clicks &#8212; and the primary engine if the probe fails. Trains online per env; no VLM.</p></div>
+    <div class="card"><h3>6 · Level-to-level transfer</h3><p>Later levels compose earlier mechanics and carry the most weight. Cache the win-model, object taxonomy, and macro-actions; reapply forward.</p></div>
+  </div>
+
+  <h3 class="blk">Execution roadmap</h3>
+  <div id="phases"></div>
+
+  <h3 class="blk">Top risks &amp; mitigations</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>#</th><th>Risk</th><th>L / I</th><th>Mitigation</th></tr>
+    <tr><td class="num">R1</td><td><b>Grader hides <code>_game</code></b> (frozen/remote step) &#8212; kills perfect-sim</td><td class="num">Med / Crit</td><td>Phase-1 RED fork pre-built (cached world-model + CNN behind a flag); re-verify on the real image ASAP</td></tr>
+    <tr><td class="num">R2</td><td>Organizers patch deepcopy / second-instance between versions</td><td class="num">Med / Crit</td><td>Use deepcopy-of-live-object (&#8800; re-instantiation); keep the RED fallback live; track wheel releases</td></tr>
+    <tr><td class="num">R3</td><td>Hidden/global RNG in OOD envs breaks deepcopy/replay</td><td class="num">Med / High</td><td>Unconditional <code>np.random</code>/<code>random</code> save-restore guard; deepcopy-only; adversarial synthetic tests</td></tr>
+    <tr><td class="num">R4</td><td>Search horizon explosion (baselines &#8594; 578, 4096 clicks)</td><td class="num">High / High</td><td>Subgoal decomposition, macro-actions, learned heuristics/click proposer, time governor &#8594; best-partial</td></tr>
+    <tr><td class="num">R5</td><td>Public-overfit fails to transfer to the private OOD set</td><td class="num">High / High</td><td>Holdout-7 gate, constant-hunt audit, mechanic-family ablation; engine-level generality only</td></tr>
+    <tr><td class="num">R6</td><td>9 h compute overrun</td><td class="num">Med / High</td><td>Time governor, UNDO instead of deepcopy in hot loops, per-env caps, checkpointed best-so-far</td></tr>
+    <tr><td class="num">R7</td><td>Offline DL packaging fails (no torch in the wheels)</td><td class="num">Med / Med</td><td>Prefer a pure-numpy proposer when GREEN; else pin a CUDA wheel to the exact image and rehearse import offline</td></tr>
+  </table>
+  </div>
+
+  <h3 class="blk">Milestone timeline</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>Date</th><th>Milestone</th><th>Target state</th></tr>
+    <tr><td><b>T0 + Day 1</b></td><td>Phase 1 gate</td><td>GREEN / YELLOW / RED locked; offline harness booting</td></tr>
+    <tr><td>+1 wk</td><td>Phase 0 done</td><td>Rig reproduces Playback 100%; budget loop + holdout split done</td></tr>
+    <tr><td>+4 wks</td><td>Phase 2 done</td><td>Explorer wins &#8805;1 level on every dev game + &#8805;1 holdout via interaction only</td></tr>
+    <tr><td><b style="color:var(--amber)">Jun 30 2026</b><br/><span class="tag">Milestone #1</span></td><td>Phase 3 partial</td><td>Search-then-execute completing a solid majority of dev-game levels; competitive partial completion on the private set. <b>Bank Milestone #1 with a working general search agent.</b></td></tr>
+    <tr><td>+9 wks</td><td>Phase 4&#8211;5</td><td>Fallback live; holdout gap small/stable; public-overfit audited out</td></tr>
+    <tr><td><b style="color:var(--amber)">Sep 30 2026</b><br/><span class="tag">Milestone #2</span></td><td>Phase 5&#8211;6 done</td><td>Full stack generalizing across families, finishing the private set in 9 h. <b>Maximize completion-weighted score; push the 100% bar.</b></td></tr>
+  </table>
+  </div>
+
+  <div class="callout tip" style="margin-top:18px">
+    <div class="em">&#9201;&#65039;</div>
+    <div><b>Critical-path summary:</b> Day-1 Phase 1 decides everything. GREEN &#8594; Jun 30 is a search-agent banking
+    exercise and Sep 30 is a generalization + completion push toward 100%. RED &#8594; re-scope to the
+    learned-world-model fallback on Day 1 and treat Milestone #1 as its proving ground.</div>
+  </div>
+</section>
+
+<!-- ===================== COMPARISON ===================== -->
+<section class="panel" id="comparison">
+ <div class="cmp">
+  <div class="hero">
+    <span class="tag">SJSU CMPE 295A · Group 2 · 2026‑06‑19</span>
+    <h1>Strategy &amp; Algorithm<br>Comparison and Ranking</h1>
+    <p>Four strategy documents, one rubric: ranked head‑to‑head, then every algorithm merged into a unified master ranking.</p>
+    <p class="crumb"><a href="#" data-goto="strategy">▶ Master Plan: Strategy</a> &nbsp;·&nbsp; <a href="#" data-goto="overview">Overview</a> &nbsp;·&nbsp; <a href="https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3">Kaggle ↗</a></p>
+    <nav class="toc">
+      <a href="#tldr">TL;DR</a>
+      <a href="#rubric">Rubric</a>
+      <a href="#compare">Side‑by‑Side</a>
+      <a href="#planrank">Plan Ranking</a>
+      <a href="#duel">research vs Master</a>
+      <a href="#algos">Algorithm Ranking</a>
+      <a href="#verdict">Verdict</a>
+    </nav>
+  </div>
+
+  <!-- TLDR -->
+  <section id="tldr">
+    <h2><span class="num">0</span>TL;DR</h2>
+    <div class="callout gold">
+      <strong>Plan ranking:</strong> <code>master_plan</code> (94) ≫ <code>plan_1</code> (63) ≈ <code>plan_2</code> (65) ≈ <code>research</code> (60).
+      <br><br>
+      <strong>The single most valuable idea in any plan</strong> appears only in the Master Plan: because the games ship as deterministic in‑process Python objects, you can clone the live game (<code>deepcopy(_game)</code>) and search it for <em>free</em> — turning <em>"the goal is never told"</em> into <em>"the goal is detectable in a rollout."</em> No external plan finds this, and it is worth more than every other technique combined.
+    </div>
+    <div class="podium">
+      <div class="pcard first"><span class="medal">🥇</span><div class="rk">RANK 1 · BACKBONE</div><h4>master_plan</h4><div class="score">94</div><div class="of">/ 100</div><div class="note">Source‑grounded; finds the exploit.</div></div>
+      <div class="pcard second"><span class="medal">🥈</span><div class="rk">RANK 2 · SCAFFOLD</div><h4>plan_1</h4><div class="score">63</div><div class="of">/ 100</div><div class="note">Realistic portfolio; right instincts.</div></div>
+      <div class="pcard third"><span class="medal">🥉</span><div class="rk">RANK 3 · PARTS BIN</div><h4>plan_2</h4><div class="score">65</div><div class="of">/ 100</div><div class="note">Exhaustive; over‑engineered.</div></div>
+      <div class="pcard fourth"><span class="medal">4️⃣</span><div class="rk">RANK 4 · BEST TO MERGE</div><h4>research</h4><div class="score">60</div><div class="of">/ 100</div><div class="note">Best‑researched; the RED‑path blueprint.</div></div>
+    </div>
+    <p class="lead"><strong>Why the order:</strong> ARC‑AGI‑3 is offline (kills LLM‑as‑policy), scored on squared action efficiency (punishes wandering), never states the goal (must be discovered), and is intentionally out‑of‑distribution (punishes overfitting). The plan that treats all four as hard constraints <em>and</em> exploits the engine as its own simulator wins. The three external plans cluster tightly behind the Master Plan with distinct profiles — and <code>research</code>, though 4th as a self‑contained strategy, is the #1 document to <em>merge</em> (see <a href="#duel">§4</a>).</p>
   </section>
+
+  <!-- RUBRIC -->
+  <section id="rubric">
+    <h2><span class="num">1</span>The rubric — what ARC‑AGI‑3 rewards</h2>
+    <div class="scrollx">
+    <table>
+      <thead><tr><th>#</th><th>Constraint</th><th>Consequence for an algorithm</th></tr></thead>
+      <tbody>
+        <tr><td class="c"><strong>C1</strong></td><td><strong>Offline</strong> — bundled LLM templates hard‑import hosted APIs</td><td>LLM‑as‑policy is <strong>dead weight</strong>. A local model is at most a prior, never the decision‑maker.</td></tr>
+        <tr><td class="c"><strong>C2</strong></td><td><strong>RHAE scoring</strong> — <code>S = min(1.15,(h/a)²)</code>, completion‑capped, later levels weigh more</td><td><strong>Completion dominates; efficiency is squared and cannot be banked.</strong> Wandering is punished quadratically.</td></tr>
+        <tr><td class="c"><strong>C3</strong></td><td><strong>Goal never stated</strong> — discovered only by interaction</td><td>Need a mechanism that <strong>detects</strong> <code>levels_completed</code>/<code>WIN</code>, not one that assumes a reward.</td></tr>
+        <tr><td class="c"><strong>C4</strong></td><td><strong>Non‑LLM leads</strong> — frontier LLMs &lt;1%, humans 100%</td><td>Bottleneck is strategy/exploration, not perception. Search/planning is the lever.</td></tr>
+        <tr><td class="c"><strong>C5</strong></td><td><strong>OOD eval</strong> — 25 public / 55 semi‑private / <strong>55 fully‑private (scored)</strong></td><td>Overfitting public games is <strong>harmful</strong>. Only <strong>engine‑level</strong> generality transfers.</td></tr>
+        <tr><td class="c"><strong>C6</strong></td><td><strong>Deterministic in‑process object</strong> — engine core has no RNG</td><td>The environment <strong>can be its own perfect simulator</strong> — the highest‑leverage exploit available.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="compare">
+    <h2><span class="num">2</span>Side‑by‑side comparison</h2>
+    <div class="scrollx">
+    <table>
+      <thead><tr><th>Dimension</th><th class="m">master_plan</th><th>plan_1</th><th>plan_2</th><th class="p">research</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Format</strong></td><td>Ranking + execution plan + risk register</td><td>25 ranked algos + build phases</td><td>26 ranked algos + deep tactics</td><td>Literature review + 4‑prototype scoping</td></tr>
+        <tr><td><strong>#1 pick</strong></td><td>Forward‑model search (deepcopy)</td><td>Object‑centric state‑graph planner</td><td>Executable world model + planner</td><td>Refinement loop + synthetic meta‑training</td></tr>
+        <tr><td><strong>Finds deepcopy exploit?</strong></td><td><span class="badge b-s">Yes — the spine</span></td><td><span class="badge b-d">No</span></td><td><span class="badge b-c">Partial</span></td><td><span class="badge b-d">No</span></td></tr>
+        <tr><td><strong>RHAE / efficiency</strong></td><td>Exact formula; completion‑dominance</td><td>Trace compression noted</td><td>Action‑cost‑aware + trace compression</td><td>Cites RHAE %; no squared‑term engagement</td></tr>
+        <tr><td><strong>OOD / anti‑overfit</strong></td><td>Held‑out split + constant‑hunt audit</td><td>Warns synthetic≠private</td><td>Self‑play + meta‑prior</td><td>Aware (StochasticGoose collapse), but meta‑training is OOD‑risky</td></tr>
+        <tr><td><strong>Evidence grounding</strong></td><td>Source‑verified wheels + ✅/🧪/⚠️</td><td>Preview results cited</td><td>arXiv IDs <em>look fabricated</em></td><td><span class="win">Best landscape</span>: real leaderboard + ARC‑AGI‑2 lineage</td></tr>
+        <tr><td><strong>Risk analysis</strong></td><td>9‑row register + Day‑1 gate</td><td>Light</td><td>Per‑algo notes</td><td>None (scoping plan)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="grid2">
+      <div class="mini"><h4>✓ What each gets uniquely right</h4><ul>
+        <li><strong>master_plan:</strong> reverse‑engineers the wheels; catches the <code>MAX_ACTIONS=80</code> footgun, the <code>lf52</code> RNG hazard, the hidden click‑pruning oracle.</li>
+        <li><strong>plan_1:</strong> puts the empirically proven approaches (state graph, action CNN) on top; clean shippable build order.</li>
+        <li><strong>plan_2:</strong> richest toolbox — active probing, causal testing, delta compiler, MPC repair, constraint solving.</li>
+        <li><strong>research:</strong> the real preview leaderboard + ARC‑AGI‑2 winners; the best RED‑path blueprint (executable world models, Z3 verifiers).</li>
+      </ul></div>
+      <div class="mini"><h4>✗ What each gets wrong</h4><ul>
+        <li><strong>master_plan:</strong> everything pivots on the deepcopy assumption holding on the <em>real</em> grader (mitigated by the Day‑1 probe + RED fallback).</li>
+        <li><strong>plan_1:</strong> frames the core as "learn a transition model" — misses that the exact model is free.</li>
+        <li><strong>plan_2:</strong> rebuilds a simulator a coding agent must verify — offline‑fragile, dominated by deepcopy; shaky citations.</li>
+        <li><strong>research:</strong> earliest‑stage; misses the exploit; barely engages the squared metric.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- PLAN RANKING -->
+  <section id="planrank">
+    <h2><span class="num">3</span>Ranking the four plans</h2>
+    <p>Scored on eight criteria (0–10). <strong>Engine exploitation</strong> and <strong>Scoring‑awareness</strong> weighted ×1.5.</p>
+    <div class="scrollx">
+    <table>
+      <caption>Weighted scorecard, normalized to 100</caption>
+      <thead><tr><th>Criterion (weight)</th><th class="c m">master_plan</th><th class="c">plan_1</th><th class="c">plan_2</th><th class="c p">research</th></tr></thead>
+      <tbody>
+        <tr><td>Offline‑awareness ×1.0</td><td class="c">10</td><td class="c">7</td><td class="c">7</td><td class="c">8</td></tr>
+        <tr><td>Scoring‑awareness ×1.5</td><td class="c">10</td><td class="c">7</td><td class="c">8</td><td class="c">5</td></tr>
+        <tr><td>Goal‑discovery ×1.0</td><td class="c">10</td><td class="c">7</td><td class="c">8</td><td class="c">7</td></tr>
+        <tr><td>Anti‑LLM realism ×1.0</td><td class="c">10</td><td class="c">8</td><td class="c">7</td><td class="c">6</td></tr>
+        <tr><td>Generalization / OOD ×1.0</td><td class="c">10</td><td class="c">7</td><td class="c">7</td><td class="c">6</td></tr>
+        <tr><td>Engine exploitation ×1.5</td><td class="c">10</td><td class="c">3</td><td class="c">4</td><td class="c">2</td></tr>
+        <tr><td>Implementation realism ×1.0</td><td class="c">9</td><td class="c">8</td><td class="c">7</td><td class="c">6</td></tr>
+        <tr><td>Evidence grounding ×1.0</td><td class="c">10</td><td class="c">6</td><td class="c">5</td><td class="c">9</td></tr>
+        <tr class="totalrow"><td>Normalized / 100</td><td class="c">94</td><td class="c">63</td><td class="c">65</td><td class="c">60</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h3>🥇 1. master_plan — 94/100 · the backbone</h3>
+    <p>The only plan grounded in the actual engine and the only one to find the decisive exploit. Correctly orders the paradigms, handles all six constraints, and de‑risks itself with a falsifiable Day‑1 gate and pre‑built fallbacks.</p>
+    <h3>🥈 2. plan_1 — 63/100 · the scaffold</h3>
+    <p>The best self‑contained external list. Right instincts (state graph + exploration on top, LLM as router only), preview‑aligned, clean phased build. Blind spot: the free simulator.</p>
+    <h3>🥉 3. plan_2 — 65/100 · the parts bin</h3>
+    <p>Most thorough and the best module source. Demoted below plan_1 on alignment: its headline executable‑world‑model loop is offline‑fragile and dominated by the free simulator, and its citations are untrustworthy.</p>
+    <h3>4. research — 60/100 · the best to merge</h3>
+    <p>The best‑researched document, but an earlier‑stage scoping note that misses the exploit and barely engages the exact metric — hence 4th as a self‑contained strategy. <strong>Yet it is the #1 document to merge</strong>: its executable‑world‑model + falsification program is the best available blueprint for the RED branch where the Master Plan is thin.</p>
+  </section>
+
+  <!-- DUEL -->
+  <section id="duel">
+    <h2><span class="num">4</span>Head‑to‑head — research vs the Master Plan</h2>
+    <div class="callout gold">
+      <strong>They are not rivals — they are the two halves of the same fork.</strong> The Master Plan's whole strategy pivots on one Day‑1 question: <em>does the grader hand us the live <code>_game</code> object to <code>deepcopy</code>?</em>
+    </div>
+    <div class="fork">
+      <div class="top">Day‑1 Simulability Probe<small>Does the grader expose the live <code>_game</code> for <code>deepcopy</code>?</small></div>
+      <div class="stem"></div>
+      <div class="branches">
+        <div class="branch green">
+          <div class="head"><span class="badge b-green">GREEN</span> deepcopy works</div>
+          <div class="owner">▶ master_plan owns this path</div>
+          <ul>
+            <li>Forward‑model BFS / IDA* / best‑first / MCTS on free, exact clones.</li>
+            <li>"Goal never told" → detect <code>levels_completed</code> in a rollout.</li>
+            <li>Executed action counts driven to ≤ human baseline → near the RHAE cap.</li>
+            <li>A perfect model you own beats any model research would build.</li>
+          </ul>
+        </div>
+        <div class="branch red">
+          <div class="head"><span class="badge b-red">RED</span> deepcopy sealed</div>
+          <div class="owner">▶ research owns this path</div>
+          <ul>
+            <li>Executable Python world model + falsification (stop on predicted‑vs‑actual divergence).</li>
+            <li>Refactor toward simpler abstractions (MDL); Z3 verifies the induced rule.</li>
+            <li>Offline synthetic‑env meta‑training + per‑episode test‑time training (NVARC template).</li>
+            <li>State graph + conv‑autoencoder/quadtree compression as the cheap substrate.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:13.5px;color:var(--muted)">The Master Plan's own RED fallback was thin ("learned deterministic transition cache + CNN"). research fills it out into a genuine research program — which is precisely why the two should be merged rather than ranked against each other.</p>
+
+    <h3>Criterion scorecard — master_plan vs research</h3>
+    <div class="scoregrid">
+      <div class="legend">
+        <span><i class="dot" style="background:var(--master)"></i> master_plan</span>
+        <span><i class="dot" style="background:var(--p4)"></i> research</span>
+      </div>
+      <div class="srow"><div class="cname">Offline‑awareness</div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:80%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">8</span></div></div></div>
+      <div class="srow"><div class="cname">Scoring‑awareness<small>squared <code>(h/a)²</code></small></div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:50%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">5</span></div></div></div>
+      <div class="srow"><div class="cname">Goal / rule induction</div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:70%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">7</span></div></div></div>
+      <div class="srow"><div class="cname">Anti‑LLM realism</div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:60%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">6</span></div></div></div>
+      <div class="srow"><div class="cname">Generalization / OOD</div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:60%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">6</span></div></div></div>
+      <div class="srow"><div class="cname">Engine exploitation<small>env as its own simulator</small></div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:20%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">2</span></div></div></div>
+      <div class="srow"><div class="cname">Implementation realism</div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:90%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">9</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:60%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">6</span></div></div></div>
+      <div class="srow"><div class="cname">Evidence grounding<small>research nearly ties here</small></div><div class="bars">
+        <div class="brow"><span class="lab">master</span><span class="track"><i style="width:100%;background:var(--master)"></i></span><span class="val" style="color:var(--master)">10</span></div>
+        <div class="brow"><span class="lab">research</span><span class="track"><i style="width:90%;background:var(--p4)"></i></span><span class="val" style="color:var(--p4)">9</span></div></div></div>
+    </div>
+
+    <h3>Two datapoints research contributes — and what they prove</h3>
+    <div class="callout red">
+      <strong>StochasticGoose: 12.58% → 0.25%.</strong> The preview's #1 learned‑exploration CNN collapsed to roughly frontier‑LLM level at full launch.
+      <br><em>Proves:</em> learned exploration <b>overfits and does not generalize</b> to the private OOD set — a direct vindication of the Master Plan's "search the actual rules, nothing to overfit," and a warning against research's own synthetic‑meta‑training bet.
+    </div>
+    <div class="callout green">
+      <strong>SingularityNET executable world model: 15/25 solved, 58.12% mean RHAE.</strong> The strongest publicly reported ARC‑AGI‑3 result — a world‑model refinement loop, no deepcopy exploit.
+      <br><em>Proves:</em> the "honest path" can go far, so research's direction is credible — <b>but</b> it ran on a hosted frontier API (not Kaggle‑eligible) and is public‑only. Where deepcopy works, the Master Plan still dominates it; where it doesn't, this is the bar to beat offline.
+    </div>
+
+    <div class="grid2">
+      <div class="mini p"><h4>★ Mine these FROM research</h4><ul>
+        <li><b>Executable world model + falsification loop</b> — the formal RED‑branch engine the Master Plan lacked.</li>
+        <li><b>Z3 / neuro‑symbolic verifier</b> — proves an induced win‑rule against every past frame.</li>
+        <li><b>Conv‑autoencoder / quadtree state compression</b> — cheaper canonical hashing for the 9 h budget.</li>
+        <li><b>ARC‑AGI‑2 transfer lessons</b> — MDL, generate‑and‑verify, SOAR evolution, TRM as fast value/policy heads.</li>
+        <li><i>Hold at arm's length:</i> synthetic‑env meta‑training &amp; adversarial game generation (OOD‑risky).</li>
+      </ul></div>
+      <div class="mini m"><h4>★ Keep these FROM the Master Plan</h4><ul>
+        <li><b>The deepcopy perfect‑simulator engine</b> — the decisive, highest‑ceiling idea, found nowhere else.</li>
+        <li><b>Exact RHAE model</b> — completion‑dominance + squared efficiency as the design spine.</li>
+        <li><b>Day‑1 go/no‑go probe</b> — the gate that decides GREEN (master) vs RED (research).</li>
+        <li><b>Engine hardening</b> — <code>MAX_ACTIONS</code> fix, <code>lf52</code> RNG guard, click‑pruning oracle.</li>
+        <li><b>OOD discipline</b> — held‑out split + constant‑hunt audit.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- ALGORITHM RANKING -->
+  <section id="algos">
+    <h2><span class="num">5</span>Unified master ranking of all algorithms</h2>
+    <p>Every distinct algorithm across the four documents, deduplicated into paradigm families and scored by <strong>fitness to ARC‑AGI‑3</strong> (0–100). <span class="src">Source: <strong>M</strong>=master_plan · <strong>1</strong>=plan_1 · <strong>2</strong>=plan_2 · <strong>R</strong>=research.</span></p>
+
+    <div class="tierhead"><span class="chip b-s">TIER S</span><span class="desc">The decisive engine</span></div>
+    <div class="scrollx"><table>
+      <thead><tr><th>Fit</th><th>Algorithm</th><th>Role</th><th class="c">Src</th></tr></thead>
+      <tbody>
+        <tr><td><div class="fit"><div class="bar"><i style="width:82%;background:var(--s)"></i></div><span class="v">82</span></div></td>
+          <td><strong>Forward‑model tree/graph search</strong> — <code>deepcopy(_game)</code> as a free exact simulator; BFS/IDA*/best‑first/MCTS, reward = <code>levels_completed</code></td>
+          <td><strong>Primary engine</strong> (if Day‑1 <code>_game</code> access). Converts the unstated goal into a checkable objective; drives executed actions ≤ human baseline.</td><td class="c src">M</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tierhead"><span class="chip b-a">TIER A</span><span class="desc">Strong, transferable substrate — build regardless</span></div>
+    <div class="scrollx"><table>
+      <thead><tr><th>Fit</th><th>Algorithm</th><th>Role</th><th class="c">Src</th></tr></thead>
+      <tbody>
+        <tr><td><div class="fit"><div class="bar"><i style="width:42%;background:var(--a)"></i></div><span class="v">42</span></div></td><td><strong>Small local CNN</strong> (action‑effect + 64×64 coordinate head)</td><td>Perception/click aide; <strong>fallback policy</strong> if <code>_game</code> sealed. Only approach with a real lead (preview 12.58%).</td><td class="c src">M,1,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:40%;background:var(--a)"></i></div><span class="v">40</span></div></td><td><strong>Object‑centric state graph</strong> (CC segmentation, canonical hash, dead‑end prune)</td><td>The shared front‑end every method reuses. Strongest <em>family</em> on the real benchmark (Blind Squirrel 6.71%).</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:38%;background:var(--a)"></i></div><span class="v">38</span></div></td><td><strong>Systematic exploration + novelty / Go‑Explore</strong></td><td>Exploration substrate driving goal discovery; language‑free. Return‑to‑state is free/exact via deepcopy.</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:36%;background:var(--a)"></i></div><span class="v">36</span></div></td><td><strong>Win‑condition / goal inference</strong> (pixel/pose/reach from <code>levels_completed</code> ticks)</td><td>The heuristic that makes deep search goal‑directed — <em>the</em> generalizing idea.</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:35%;background:var(--a)"></i></div><span class="v">35</span></div></td><td><strong>Click‑target pruning</strong> (clicks only at object centroids; validate on sim)</td><td>Reconstructs the hidden <code>_get_valid_clickable_actions</code>; collapses the 4096‑wide branch.</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:34%;background:var(--a)"></i></div><span class="v">34</span></div></td><td><strong>Hierarchical macros / skills + level‑to‑level transfer</strong></td><td>Tames deep search and converts partial → full completion (the dominant scoring lever).</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:32%;background:var(--a)"></i></div><span class="v">32</span></div></td><td><strong>Trace compression / plan minimization</strong> (replay‑verify)</td><td>Pure efficiency squeeze → directly improves the squared <code>(h/a)²</code> term. Cheap; run last.</td><td class="c src">1,2</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tierhead"><span class="chip b-b">TIER B</span><span class="desc">Useful modules — conditional or supporting</span></div>
+    <div class="scrollx"><table>
+      <thead><tr><th>Fit</th><th>Algorithm</th><th>Role</th><th class="c">Src</th></tr></thead>
+      <tbody>
+        <tr><td><div class="fit"><div class="bar"><i style="width:34%;background:var(--b)"></i></div><span class="v">34</span></div></td><td><strong>Program / DSL synthesis</strong> — <em>win‑predicate induction only</em></td><td>Keep the symbolic goal inducer; drop symbolic dynamics (dominated by the exact sim).</td><td class="c src">M,1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:30%;background:var(--b)"></i></div><span class="v">30</span></div></td><td><strong>Model Predictive Control</strong> (plan in sim, execute prefix, re‑validate, repair)</td><td>Right discipline when the model is approximate; collapses to "just execute" when exact.</td><td class="c src">2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:30%;background:var(--b)"></i></div><span class="v">30</span></div></td><td><strong>Executable world model + verifier</strong></td><td><strong>Strong only if deepcopy is unavailable.</strong> The formal RED‑branch engine; otherwise dominated.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:29%;background:var(--b)"></i></div><span class="v">29</span></div></td><td><strong>Active probing / Bayesian design / causal testing</strong></td><td>Cheap mechanic discovery before search; squared efficiency rewards minimizing wasted probes.</td><td class="c src">2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:28%;background:var(--b)"></i></div><span class="v">28</span></div></td><td><strong>Visual delta compiler</strong> (cell/object diffs → semantic events)</td><td>Clean input layer feeding every higher method; low‑risk infrastructure.</td><td class="c src">2</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:28%;background:var(--b)"></i></div><span class="v">28</span></div></td><td><strong>Affordance discovery</strong> (passable/hazard/clickable/movable tables)</td><td>Bootstraps perception priors; must be <em>verified by interaction</em>, never hardcoded.</td><td class="c src">2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:27%;background:var(--b)"></i></div><span class="v">27</span></div></td><td><strong>Classical pathfinding</strong> (A*/BFS/Dijkstra)</td><td>Fast, reliable solver for the navigation subproblems that recur inside many levels.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:27%;background:var(--b)"></i></div><span class="v">27</span></div></td><td><strong>Portfolio meta‑controller / router</strong></td><td>Robustness across diverse private games; run cheap solvers first, escalate.</td><td class="c src">1,2</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:26%;background:var(--b)"></i></div><span class="v">26</span></div></td><td><strong>Constraint / SAT‑SMT planning</strong> (alignment, Sokoban; Z3)</td><td>Specialized power solver for the puzzle‑constraint subclass; also verifies induced win‑rules.</td><td class="c src">2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:26%;background:var(--b)"></i></div><span class="v">26</span></div></td><td><strong>Value / heuristic model</strong> (small net / ResNet18 / TRM)</td><td>Search heuristic only (Blind Squirrel‑style), never the full policy.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:25%;background:var(--b)"></i></div><span class="v">25</span></div></td><td><strong>Risk‑aware + action‑cost‑aware planning</strong></td><td>Directly serves the metric; bolt onto the planner's cost function.</td><td class="c src">2</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:24%;background:var(--b)"></i></div><span class="v">24</span></div></td><td><strong>Memory across levels</strong></td><td>Subsumed by level‑to‑level transfer; essential for the completion cap.</td><td class="c src">1,2,R</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tierhead"><span class="chip b-c">TIER C</span><span class="desc">Weak fit — contingency only</span></div>
+    <div class="scrollx"><table>
+      <thead><tr><th>Fit</th><th>Algorithm</th><th>Role</th><th class="c">Src</th></tr></thead>
+      <tbody>
+        <tr><td><div class="fit"><div class="bar"><i style="width:18%;background:var(--c)"></i></div><span class="v">18</span></div></td><td><strong>Learned world models at test time</strong> (DreamerV3 / MuZero / IRIS)</td><td>Right family, wrong problem — you already own the exact model. Thin RED‑fork fallback only.</td><td class="c src">1,2</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:18%;background:var(--c)"></i></div><span class="v">18</span></div></td><td><strong>Workspace optimization / multi‑agent blackboard</strong> (Arcgentica / DreamTeam)</td><td>Heavy engineering; its value needs an offline LLM to shine. Optional orchestration layer.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:18%;background:var(--c)"></i></div><span class="v">18</span></div></td><td><strong>Meta‑RL / in‑context RL</strong> (Decision Transformer, RL², AMAGO, AD)</td><td>Amortizes over a <em>known</em> distribution; the eval is intentionally OOD. Distilled prior at most.</td><td class="c src">2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:16%;background:var(--c)"></i></div><span class="v">16</span></div></td><td><strong>Local LLM as hypothesis router</strong></td><td>Non‑policy aide only; every output code‑verified. Slow, hallucination‑prone.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:15%;background:var(--c)"></i></div><span class="v">15</span></div></td><td><strong>Synthetic game pretraining / meta‑prior</strong> (incl. adversarial game generation)</td><td>Speeds exploration <em>if</em> the synthetic distribution overlaps private mechanics — a big if.</td><td class="c src">1,2,R</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="tierhead"><span class="chip b-d">TIER D</span><span class="desc">Poor fit — avoid as primary</span></div>
+    <div class="scrollx"><table>
+      <thead><tr><th>Fit</th><th>Algorithm</th><th>Role</th><th class="c">Src</th></tr></thead>
+      <tbody>
+        <tr><td><div class="fit"><div class="bar"><i style="width:8%;background:var(--d)"></i></div><span class="v">8</span></div></td><td><strong>Model‑free deep RL</strong> (PPO/DQN/Rainbow/IMPALA)</td><td>Needs 10⁵–10⁸ interactions vs a ~10²–10³ single‑life budget; squared efficiency punishes its core mechanism.</td><td class="c src">1,2</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:6%;background:var(--d)"></i></div><span class="v">6</span></div></td><td><strong>Pure LLM ReAct / frontier agent as policy</strong></td><td>Mechanically dead offline; empirically &lt;1% even at the frontier. Excluded as a decision‑maker.</td><td class="c src">1,2,R</td></tr>
+        <tr><td><div class="fit"><div class="bar"><i style="width:3%;background:var(--d)"></i></div><span class="v">3</span></div></td><td><strong>Random / evolutionary action search</strong></td><td>Calibration floor only (random solves a non‑tutorial level &lt;1/10,000).</td><td class="c src">1,R</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- VERDICT -->
+  <section id="verdict">
+    <h2><span class="num">6</span>Verdict &amp; recommended synthesis</h2>
+    <p class="lead">Adopt <strong>master_plan</strong> as the backbone, then graft in the best modules from the external plans:</p>
+    <ul class="clean">
+      <li><strong>Engine:</strong> forward‑model search on <code>deepcopy(_game)</code> — gated by the Day‑1 simulability probe.</li>
+      <li><strong>GREEN →</strong> forward‑model search is the primary engine; research's Z3 verifier and state‑compression ideas become supporting modules.</li>
+      <li><strong>RED →</strong> promote research's executable‑world‑model + falsification + offline‑training program to the primary engine; far more developed than the Master Plan's original RED stub.</li>
+      <li><strong>Substrate (all plans agree):</strong> object‑centric state graph + canonical hashing + novelty exploration + click pruning + win‑condition inference. Build first; reuse everywhere.</li>
+      <li><strong>Efficiency (plan_1 / plan_2):</strong> trace compression + action‑cost‑aware planning — cheap, amplifies the squared <code>(h/a)²</code> term.</li>
+      <li><strong>Discovery (plan_2 / research):</strong> active/Bayesian probing, causal testing, delta compiler, Z3 win‑rule verification.</li>
+      <li><strong>Keep LLMs out of the action loop entirely</strong> — at most a local, code‑verified hypothesis router.</li>
+    </ul>
+    <div class="callout">
+      <strong>One line:</strong> The Master Plan supplies the winning engine, the rigor, and the Day‑1 gate; plan_1 supplies the realistic scaffolding; plan_2 supplies the richest toolbox; research supplies the competitive‑landscape evidence and the best blueprint for the branch the Master Plan can't yet fill.
+    </div>
+  </section>
+
+ </div>
+</section>
+
+<!-- ===================== REPO GUIDE ===================== -->
+<section class="panel" id="repo">
+ <div class="fld">
+  <h2 class="sr">A guide to the arc-prize-2026-arc-agi-3 folder structure.</h2>
+  <div class="hero">
+    <div class="eyebrow">Competition resource kit · ARC&#8209;AGI&#8209;3</div>
+    <h1>Inside the <span class="grad">arc-prize-2026-arc-agi-3</span> folder</h1>
+    <p class="sub">This is the competition's entire toolkit: the official agent framework, the libraries that run games
+      <b>offline, right on your machine</b>, and 25 sample games. Click any item in the file tree for a detailed
+      explanation.</p>
+    <div class="legend">
+      <span class="lg"><b style="background:var(--green)"></b> Core &mdash; keep</span>
+      <span class="lg"><b style="background:var(--red)"></b> Dead offline</span>
+      <span class="lg"><b style="background:var(--teal)"></b> Offline runtime library</span>
+      <span class="lg"><b style="background:var(--violet)"></b> Game (obfuscated code)</span>
+      <span class="lg"><b style="background:var(--gray)"></b> Config / other</span>
+    </div>
+  </div>
+
+  <h2>Explore the file tree</h2>
+  <p class="lead">Three big blocks: <span class="mono">ARC-AGI-3-Agents/</span> (agent code),
+    <span class="mono">arc_agi_3_wheels/</span> (libraries), and <span class="mono">environment_files/</span> (games).</p>
+
+  <div class="explorer">
+    <div class="tree" id="fld-tree">
+      <div class="node on" data-id="root"><span class="em">&#128193;</span><span class="nm">arc-prize-2026-arc-agi-3/</span></div>
+
+      <div class="grp">1 · Agent framework</div>
+      <div class="node ind1" data-id="sdk"><span class="em">&#128193;</span><span class="nm">ARC-AGI-3-Agents/</span></div>
+      <div class="node ind2" data-id="agentsdir"><span class="em">&#128193;</span><span class="nm">agents/</span></div>
+      <div class="node ind3" data-id="agentpy"><span class="em">&#128196;</span><span class="nm">agent.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="swarmpy"><span class="em">&#128196;</span><span class="nm">swarm.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="recorderpy"><span class="em">&#128196;</span><span class="nm">recorder.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="initpy"><span class="em">&#128196;</span><span class="nm">__init__.py</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind3" data-id="tracingpy"><span class="em">&#128196;</span><span class="nm">tracing.py</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind3" data-id="templates"><span class="em">&#128193;</span><span class="nm">templates/</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind2" data-id="mainpy"><span class="em">&#128196;</span><span class="nm">main.py</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind2" data-id="envex"><span class="em">&#9881;</span><span class="nm">.env.example</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind2" data-id="pyproject"><span class="em">&#9881;</span><span class="nm">pyproject.toml</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind2" data-id="tests"><span class="em">&#128193;</span><span class="nm">tests/</span><span class="dotb" style="background:var(--gray)"></span></div>
+
+      <div class="grp">2 · Offline libraries</div>
+      <div class="node ind1" data-id="wheels"><span class="em">&#128193;</span><span class="nm">arc_agi_3_wheels/</span></div>
+      <div class="node ind2" data-id="arcengine"><span class="em">&#128230;</span><span class="nm">arcengine-0.9.3.whl</span><span class="dotb" style="background:var(--teal)"></span></div>
+      <div class="node ind2" data-id="arcagi"><span class="em">&#128230;</span><span class="nm">arc_agi-0.9.8.whl</span><span class="dotb" style="background:var(--teal)"></span></div>
+      <div class="node ind2" data-id="otherwheels"><span class="em">&#128230;</span><span class="nm">numpy, pydantic, pillow…</span><span class="dotb" style="background:var(--teal)"></span></div>
+
+      <div class="grp">3 · Sample games</div>
+      <div class="node ind1" data-id="envfiles"><span class="em">&#128193;</span><span class="nm">environment_files/</span></div>
+      <div class="node ind2" data-id="onegame"><span class="em">&#128193;</span><span class="nm">ls20/ &middot; cd82/ &middot; … (25 games)</span></div>
+      <div class="node ind3" data-id="gamepy"><span class="em">&#128196;</span><span class="nm">&lt;id&gt;.py</span><span class="dotb" style="background:var(--violet)"></span></div>
+      <div class="node ind3" data-id="metadata"><span class="em">&#128196;</span><span class="nm">metadata.json</span><span class="dotb" style="background:var(--violet)"></span></div>
+    </div>
+
+    <div class="detail" id="fld-detail"></div>
+  </div>
+
+  <h2>How does a game run?</h2>
+  <p class="lead">The entire lifecycle runs <b>right inside your machine's Python process</b> &mdash; no internet, no server.</p>
+  <div class="flow">
+    <div class="fstep"><div class="fn">Arcade.make()</div><div class="ft">Load game</div><div class="fd">Reads <span class="mono">&lt;id&gt;.py</span> from disk, builds the live <span class="mono">_game</span> object.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">Agent.main()</div><div class="ft">Loop</div><div class="fd">Loops until WIN: calls <span class="mono">choose_action()</span>.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">step(action)</div><div class="ft">Act</div><div class="fd">Sends one move (a key, or a click at x,y).</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">FrameData</div><div class="ft">Observe</div><div class="fd">64&times;64 grid, <span class="mono">state</span>, <span class="mono">levels_completed</span>, <span class="mono">available_actions</span>.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">scorecard</div><div class="ft">Score</div><div class="fd">Counts actions to compute the RHAE score.</div></div>
+  </div>
+
+  <h2>The 4 most important takeaways from this folder</h2>
+  <div class="grid">
+    <div class="card"><h3><span class="ic">&#128268;</span>Offline = LLMs are dead</h3><p>The entire <span class="mono">templates/</span> folder calls external APIs (OpenAI…). With <b>no internet</b> at eval, drop them; keep only the framework in <span class="mono">agent.py</span>.</p></div>
+    <div class="card"><h3><span class="ic">&#129518;</span>Game = perfect simulator</h3><p>The <span class="mono">_game</span> object lives in RAM &rarr; you can <span class="mono">deepcopy</span> it to try moves <b>for free</b>, find the optimal solution, then play for real.</p></div>
+    <div class="card"><h3><span class="ic">&#9888;</span>MAX_ACTIONS = 80 is too low</h3><p>The template default allows only 80 moves; real games need up to <b>578</b>. Raise it to the rule's <span class="mono">5&times;h</span>.</p></div>
+    <div class="card"><h3><span class="ic">&#128272;</span>Game code is obfuscated</h3><p>Variable names in <span class="mono">&lt;id&gt;.py</span> are randomized &mdash; <b>you can't read the rules</b>; the agent must learn by playing. These 25 games are for practice, not memorization.</p></div>
+  </div>
+
+  <div class="card" style="margin-top:24px;background:rgba(45,212,191,.05);border-color:rgba(45,212,191,.3)">
+    <p style="color:var(--txt2);font-size:14px;margin:0">This guide is also available as a standalone page
+    (<span class="mono">planning/repo_guide.html</span>). Next: see the
+    <b><a href="#" data-goto="strategy">Strategy</a></b> that turns this folder into a winning agent.</p>
+  </div>
+ </div>
+</section>
 
 </main>
 
-<footer>
-  <div class="wrap frow">
-    <span>SJSU CMPE 295A · Group 2 · ARC Prize 2026 — ARC‑AGI‑3</span>
-    <span><a href="https://github.com/cmpe295a-group2/testing-arc-agi-3">GitHub repo ↗</a> · <a href="https://arcprize.org/competitions/2026/arc-agi-3">ARC Prize ↗</a></span>
+<footer class="footer">
+  <div class="wrap">
+    <p style="margin:0 0 8px"><b style="color:var(--txt2)">ARC&#8209;AGI&#8209;3 Master Strategy</b> &#8212; SJSU CMPE 295A,
+      Group 2 · explainer generated from <code>master_plan.md</code> (2026-06-19).</p>
+    <p style="margin:0 0 12px">Sources:
+      <a href="https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3">ARC Prize 2026 (Kaggle)</a> ·
+      <a href="https://arcprize.org/competitions/2026/arc-agi-3">competition page</a> ·
+      <a href="https://arcprize.org/media/ARC_AGI_3_Technical_Report.pdf">Technical Report (Apr 2026)</a> ·
+      <a href="https://arcprize.org/blog/arc-agi-3-preview-30-day-learnings">30-day preview learnings</a>.</p>
+    <p style="margin:0">Confidence tags: <span class="badge b-ok">&#10003;</span> source/report-verified ·
+      <span class="badge b-test">&#129514;</span> confirm Day-1 · <span class="badge b-ext">&#9888;</span>
+      external / not source-verifiable. The strategy is sound but <b>load-bearing on the Day-1 simulability probe</b>.</p>
   </div>
 </footer>
 
+<script>
+/* ---------- tab switching ---------- */
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+function show(id){
+  tabs.forEach(t=>t.classList.toggle('active', t.dataset.p===id));
+  panels.forEach(p=>p.classList.toggle('active', p.id===id));
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.p)));
+document.querySelectorAll('[data-goto]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();show(a.dataset.goto);}));
+
+/* ---------- 16-color palette (ARC-style) ---------- */
+const COLORS = ['#101725','#1E93FF','#F93C31','#4FCC30','#FFDC00','#999999',
+  '#E53AA3','#FF851B','#87D8F1','#921231','#7FDBFF','#B10DC9',
+  '#39CCCC','#01FF70','#85144B','#F012BE'];
+const pal = document.getElementById('palette');
+COLORS.forEach((c,i)=>{
+  const d=document.createElement('div');
+  d.className='swatch'; d.style.background=c;
+  d.textContent=i;
+  if(i===0){d.style.color='#7a8aa0';}
+  pal.appendChild(d);
+});
+
+/* ---------- RHAE calculator ---------- */
+const hIn=document.getElementById('hIn'), aIn=document.getElementById('aIn');
+const hOut=document.getElementById('hOut'), aOut=document.getElementById('aOut');
+const sOut=document.getElementById('sOut'), ratioOut=document.getElementById('ratioOut'), rawOut=document.getElementById('rawOut');
+const cIn=document.getElementById('cIn'), eIn=document.getElementById('eIn');
+const cOut=document.getElementById('cOut'), eOut=document.getElementById('eOut');
+const envOut=document.getElementById('envOut'), capOut=document.getElementById('capOut'), wOut=document.getElementById('wOut');
+const TOTAL_LVLS=6, TOTAL_W=21; // 1+2+3+4+5+6
+
+function levelScore(h,a){ return Math.min(1.15, Math.pow(h/a,2)); }
+function pct(x){ return (x*100).toFixed(x<0.1?1:0)+'%'; }
+
+function updateLevel(){
+  const h=+hIn.value, a=+aIn.value;
+  hOut.textContent=h; aOut.textContent=a;
+  const s=levelScore(h,a);
+  sOut.textContent=pct(s);
+  sOut.style.color = s>=0.9?'var(--green)': s>=0.4?'var(--yellow)':'var(--red)';
+  ratioOut.textContent=(a/h).toFixed(2)+'×';
+  rawOut.textContent=Math.pow(h/a,2).toFixed(2);
+  drawCurve(a/h);
+}
+function updateEnv(){
+  const c=+cIn.value, e=+eIn.value/100;
+  cOut.textContent=c; eOut.textContent=(e*100).toFixed(0)+'%';
+  // weight of completed levels = sum 1..c
+  const wDone = c*(c+1)/2;
+  const cap = wDone/TOTAL_W;
+  // weighted avg efficiency only over completed levels; uncompleted contribute 0
+  const weightedAvg = e * cap; // e is avg over solved, scaled by their weight share
+  const env = Math.min(cap, weightedAvg);
+  capOut.textContent=pct(cap);
+  wOut.textContent=wDone+'/'+TOTAL_W;
+  envOut.textContent=pct(env);
+  envOut.style.color = env>=0.9?'var(--green)': env>=0.4?'var(--violet)':'var(--red)';
+}
+
+/* curve canvas */
+const cv=document.getElementById('curve'), cx=cv.getContext('2d');
+function drawCurve(markRatio){
+  const W=cv.width, H=cv.height, padL=44, padB=28, padT=14, padR=14;
+  cx.clearRect(0,0,W,H);
+  const x0=padL, x1=W-padR, y0=H-padB, y1=padT;
+  const maxR=5; // a/h from ~0.6 to 5
+  const minR=0.6;
+  const X=r=>x0+(r-minR)/(maxR-minR)*(x1-x0);
+  const Y=s=>y0-(s/1.15)*(y0-y1);
+  // grid + axes
+  cx.strokeStyle='rgba(255,255,255,.08)'; cx.lineWidth=1; cx.fillStyle='#6f8198';
+  cx.font='11px ui-monospace,monospace';
+  [0,0.25,0.5,0.75,1.0].forEach(s=>{
+    const y=Y(s); cx.beginPath(); cx.moveTo(x0,y); cx.lineTo(x1,y); cx.stroke();
+    cx.fillText((s*100).toFixed(0)+'%', 6, y+4);
+  });
+  [1,2,3,4,5].forEach(r=>{
+    const x=X(r); cx.fillText(r+'×', x-6, y0+18);
+  });
+  // curve
+  cx.strokeStyle='#2dd4bf'; cx.lineWidth=2.5; cx.beginPath();
+  let first=true;
+  for(let r=minR;r<=maxR;r+=0.02){
+    const s=Math.min(1.15,1/(r*r));
+    const x=X(r), y=Y(s);
+    if(first){cx.moveTo(x,y);first=false;}else cx.lineTo(x,y);
+  }
+  cx.stroke();
+  // reference markers at 2x (25%) and 5x (4%)
+  cx.fillStyle='rgba(245,114,106,.85)'; cx.font='10px ui-monospace,monospace';
+  // marker dot for current ratio
+  const r=Math.max(minR,Math.min(maxR,markRatio));
+  const s=Math.min(1.15,1/(r*r));
+  const mx=X(r), my=Y(s);
+  cx.fillStyle='#f5b860'; cx.beginPath(); cx.arc(mx,my,5,0,6.3); cx.fill();
+  cx.strokeStyle='rgba(245,184,96,.4)'; cx.lineWidth=1; cx.beginPath();
+  cx.moveTo(mx,my); cx.lineTo(mx,y0); cx.stroke();
+}
+
+[hIn,aIn].forEach(el=>el.addEventListener('input',updateLevel));
+[cIn,eIn].forEach(el=>el.addEventListener('input',updateEnv));
+updateLevel(); updateEnv();
+
+/* ---------- algorithm ranking ---------- */
+const RANKS=[
+  {r:1,nm:'Forward-model tree/graph search',sub:'deepcopy = perfect simulator · BFS / IDA* / best-first / MCTS',role:'Primary engine (if Day-1 _game access)',fit:82,c:'var(--teal)'},
+  {r:2,nm:'Small local CNN perception',sub:'action-effect + 64×64 coordinate head, segmenter, frame-diff',role:'Perception aide; fallback policy if _game sealed',fit:42,c:'var(--blue)'},
+  {r:3,nm:'Go-Explore + novelty exploration',sub:'cell archive, return-to-state, RND, frame-change reward',role:'Exploration substrate feeding search',fit:38,c:'var(--violet)'},
+  {r:4,nm:'Neuro-symbolic object-centric + state graph',sub:'CC segmentation, canonical hash, dead-end prune',role:'State-abstraction front-end',fit:38,c:'var(--violet)'},
+  {r:5,nm:'Program/DSL synthesis & win-predicate induction',sub:'induce the win condition, not the dynamics',role:'Symbolic goal-induction module only',fit:34,c:'var(--amber)'},
+  {r:6,nm:'Learned world models',sub:'DreamerV3 / MuZero / IRIS, test-time',role:'Thin contingency fallback',fit:18,c:'var(--red)'},
+  {r:7,nm:'Meta-RL / in-context RL',sub:'RL², AMAGO, RELIC, Algorithm Distillation',role:'Not recommended; at most a move-order prior',fit:18,c:'var(--red)'},
+  {r:8,nm:'Model-free deep RL',sub:'PPO, DQN/Rainbow, IMPALA, R2D2',role:'Not recommended; offline-distilled prior at most',fit:8,c:'var(--red)'},
+];
+const ranksEl=document.getElementById('ranks');
+RANKS.forEach(x=>{
+  const d=document.createElement('div'); d.className='rank';
+  d.innerHTML=`<div class="row">
+    <div class="rk">${x.r}</div>
+    <div class="nm">${x.nm}<small>${x.sub}</small></div>
+    <div class="role">${x.role}</div>
+    <div class="fitbar"><i style="width:${x.fit}%;background:${x.c};opacity:.28"></i><span>${x.fit}</span></div>
+  </div>`;
+  ranksEl.appendChild(d);
+});
+
+/* ---------- phases ---------- */
+const PHASES=[
+  {n:'0',t:'Offline harness & test rig',w:'Days 0–5',d:'Build the offline venv from the bundled wheels (no network/DL imports), instantiate envs in OFFLINE mode, raise MAX_ACTIONS to 5·h, re-implement the RHAE scoring rig, wire Playback for a 100% sanity check, and freeze an 18-dev / 7-holdout generalization split.',e:'All 25 load + step offline; rig reproduces Playback 100%; holdout frozen.'},
+  {n:'1',t:'DAY-1 critical experiment',w:'Day 1',d:'The go/no-go gate. Verify scorecard isolation, deepcopy determinism, replay divergence (expected to fail on lf52), and an RNG/IO audit with an unconditional save-restore guard. Lock GREEN / YELLOW / RED.',e:'GREEN → forward-model search is primary; RED → pivot to learned world-model + CNN now.'},
+  {n:'2',t:'Explorer: goal discovery',w:'Weeks 2–4',d:'Object-centric perception (CC segmentation), directed state-graph explore-and-prune with canonical-hash dedup, a dense reward oracle from the simulator, and no-op / dead-end detection by frame equality.',e:'Explorer reaches WIN on ≥1 level of every dev game + ≥1 holdout via interaction only.'},
+  {n:'3',t:'Planner: search-then-execute',w:'Weeks 4–7',d:'Engine selection by horizon (BFS/IDDFS → best-first/A* → MCTS), heuristics derived from perception (not hardcoded), subgoal decomposition & macro-actions to tame depth, a compute-bounded search with best-partial fallback, and minimal execution.',e:'≥80% of dev-game levels completed end-to-end at ≤ baseline counts; measurable holdout completion.'},
+  {n:'4',t:'Perception & world-model fallback',w:'Weeks 6–9',d:'A local CNN action-effect/click proposer (online per game), a learned deterministic world model as the RED fallback behind a feature flag, an only-if-needed offline GPU torch package, and dropping all VLM ideas.',e:'RED fallback runs end-to-end on ≥1 env; CNN proposer beats random click selection.'},
+  {n:'5',t:'Generalization hardening',w:'Weeks 9–12',d:'A holdout-only promotion gate, a hunt-and-delete pass on env-specific constants, RNG-guard + deepcopy stress tests on adversarial synthetic envs, and a mechanic-family ablation without per-family code.',e:'Holdout-7 completion within a small stable gap of dev-18; zero hardcoded public constants.'},
+  {n:'6',t:'Compute-budget management',w:'Weeks 11–13',d:'A global time governor (~9h / envs×levels), cheap state copy (incremental save/restore or UNDO in hot loops), score-leverage allocation toward late levels, per-env caps, and checkpointed best-so-far.',e:'Full dry-run over 25 public envs completes within margin.'},
+  {n:'7',t:'Submission packaging & open-source',w:'Weeks 12–13',d:'An offline notebook installing --no-index from bundled wheels, a self-contained OFFLINE harness, deterministic global seeding, a CC0/MIT-0 license, and an end-to-end rehearsal before each milestone.',e:'Notebook runs offline start-to-finish under budget, scores via the rig, license present.'},
+];
+const phEl=document.getElementById('phases');
+PHASES.forEach((p,i)=>{
+  const d=document.createElement('div'); d.className='phase';
+  d.innerHTML=`<div class="ptrack"><div class="pnode">${p.n}</div>${i<PHASES.length-1?'<div class="pline"></div>':''}</div>
+    <div class="pbody"><div class="when">${p.w}</div><h4>Phase ${p.n} · ${p.t}</h4>
+      <p>${p.d}</p><div class="exit"><b>Exit:</b> ${p.e}</div></div>`;
+  phEl.appendChild(d);
+});
+
+/* ---------- repo guide (folder explorer) ---------- */
+(function(){
+  const data={
+    root:{path:"arc-prize-2026-arc-agi-3/",badge:["cfg","Root folder"],title:"The competition's root folder",
+      p:"Everything you need to build an ARC-AGI-3 agent. Three blocks: agent code, offline runtime libraries, and sample games.",
+      li:["<b>ARC-AGI-3-Agents/</b> &mdash; the official framework (SDK) for writing agents.","<b>arc_agi_3_wheels/</b> &mdash; <span class='mono'>.whl</span> libraries to run games locally, no internet needed.","<b>environment_files/</b> &mdash; 25 public games (each is one Python file + one metadata file)."],
+      box:["note","Goal: from this folder, build an agent that explores &amp; solves <b>never-before-seen</b> games on its own &mdash; offline, within 9 hours on a single RTX 6000 GPU."]},
+    sdk:{path:"ARC-AGI-3-Agents/",badge:["keep","Agent framework"],title:"The official agent SDK",
+      p:"A clone of ARC Prize's official repo. Contains the abstract Agent class, a multi-game orchestrator, record/replay tooling, and many sample templates.",
+      li:["Usable at eval: <b>agent.py</b>, <b>swarm.py</b>, <b>recorder.py</b>.","Dropped at eval: <b>main.py</b> and the entire <b>templates/</b> LLM family (need internet)."],
+      box:["keep","We subclass the <span class='mono'>Agent</span> class here and override two methods: <span class='mono'>choose_action()</span> and <span class='mono'>is_done()</span>."]},
+    agentsdir:{path:"ARC-AGI-3-Agents/agents/",badge:["keep","Main code package"],title:"The agents/ package",
+      p:"The heart of the SDK. A Python package holding the base class and the templates.",
+      li:["<b>agent.py</b> &mdash; the <span class='mono'>Agent</span> + <span class='mono'>Playback</span> classes.","<b>swarm.py</b> &mdash; runs many agents/games in parallel.","<b>recorder.py</b> &mdash; record &amp; replay runs (JSONL).","<b>templates/</b> &mdash; sample agents (mostly LLM-based)."]},
+    agentpy:{path:"agents/agent.py",badge:["keep","Core &mdash; most important"],title:"agent.py &mdash; the Agent class",
+      p:"The most important file. Defines the main loop and the two extension points we must write ourselves.",
+      li:["<b>Main loop:</b> repeats <span class='mono'>choose_action &rarr; take_action &rarr; append_frame</span> until win or out of moves.","<b>choose_action()</b> &mdash; the brain: picks the next action.","<b>is_done()</b> &mdash; the stop condition (usually <span class='mono'>state == WIN</span>).","The <span class='mono'>arc_env</span> object is passed in &mdash; the &ldquo;handle&rdquo; to the live game."],
+      box:["note","⚠️ The <span class='mono'>MAX_ACTIONS = 80</span> constant here is far too low for real games &mdash; it must be raised."]},
+    swarmpy:{path:"agents/swarm.py",badge:["keep","Orchestration"],title:"swarm.py &mdash; the orchestrator",
+      p:"Builds many agents (one per game) on separate threads, opening/closing the scorecard.",
+      li:["Builds <span class='mono'>Arcade()</span> then calls <span class='mono'>.make(game)</span> per game.","Defaults to NORMAL mode (local + API) &rarr; at eval we must force <b>OFFLINE</b>.","The <span class='mono'>Arcade.make(...)</span> wiring is well worth reusing."]},
+    recorderpy:{path:"agents/recorder.py",badge:["keep","Record / replay"],title:"recorder.py &mdash; the run recorder",
+      p:"Logs every frame &amp; action to a JSONL file; the Playback class replays them exactly.",
+      li:["This is the &ldquo;human replay = 100%&rdquo; harness the organizers mention.","Used as: the run data format + a determinism sanity tool.","Note: replaying recorded moves scores <b>0</b> on a new game (it doesn't generalize)."]},
+    initpy:{path:"agents/__init__.py",badge:["cfg","Registry"],title:"__init__.py &mdash; the agent registry",
+      p:"Auto-collects every Agent subclass into the <span class='mono'>AVAILABLE_AGENTS</span> list.",
+      li:["⚠️ It <b>eagerly imports</b> every template (openai, langgraph, smolagents).","On an offline machine these imports can crash &rarr; at eval, <b>don't import this file</b>; register only our own agent."]},
+    tracingpy:{path:"agents/tracing.py",badge:["kill","Optional / drop"],title:"tracing.py &mdash; AgentOps tracing",
+      p:"A decorator that traces runs to AgentOps (an external service).",
+      li:["Only for observability/debugging during development.","Needs internet &rarr; drop from the submission."]},
+    templates:{path:"agents/templates/",badge:["kill","Dead offline"],title:"templates/ &mdash; sample agents",
+      p:"A collection of sample agents: random, LLM variants, LangGraph, smolagents, multimodal…",
+      li:["<b>random_agent.py</b> &mdash; still usable (a baseline to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_*.py</b> &mdash; all call external LLM APIs."],
+      box:["kill","With no internet at eval, this whole LLM family is useless &mdash; delete it from the submission. Keep only the idea of the action/observation format."]},
+    mainpy:{path:"ARC-AGI-3-Agents/main.py",badge:["kill","Online only"],title:"main.py &mdash; the online runner",
+      p:"The default entrypoint: fetches the game list over HTTP from <span class='mono'>three.arcprize.org</span>.",
+      li:["Hard-depends on the network &rarr; offline it finds &ldquo;no games&rdquo; and exits.","At eval: replace with our own entrypoint using <span class='mono'>Arcade(OFFLINE)</span> to scan <span class='mono'>environment_files/</span>."]},
+    envex:{path:"ARC-AGI-3-Agents/.env.example",badge:["cfg","Config"],title:".env.example &mdash; sample config",
+      p:"Sample environment variables: server, API keys, run mode.",
+      li:["Points at <span class='mono'>three.arcprize.org</span>, with <span class='mono'>OPENAI_API_KEY</span>, <span class='mono'>ARC_API_KEY</span>.","Has an <span class='mono'>OPERATION_MODE</span> flag &mdash; we set it to <b>offline</b>."]},
+    pyproject:{path:"ARC-AGI-3-Agents/pyproject.toml",badge:["cfg","Config"],title:"pyproject.toml &mdash; package manifest",
+      p:"Lists dependencies: arc-agi, openai, langchain, langgraph, smolagents, numpy, pydantic, pillow…",
+      li:["Shows the project's original library set.","Note: <b>no torch/tensorflow</b> &mdash; if you need a neural net, you must self-package a CUDA wheel."]},
+    tests:{path:"ARC-AGI-3-Agents/tests/",badge:["cfg","Tests"],title:"tests/ &mdash; the test suite",
+      p:"Unit tests for the core, recorder, and swarm.",
+      li:["<span class='mono'>test_core.py</span>, <span class='mono'>test_recorder.py</span>, <span class='mono'>test_swarm.py</span>.","Handy for understanding the SDK's expected behavior."]},
+    wheels:{path:"arc_agi_3_wheels/",badge:["lib","Offline libraries"],title:"arc_agi_3_wheels/ &mdash; offline install libraries",
+      p:"~30 <span class='mono'>.whl</span> files to install with no internet. This is what lets games run directly on your machine.",
+      li:["Two core libraries: <b>arcengine</b> (the game engine) &amp; <b>arc_agi</b> (the wrapper + scoring).","Plus numpy, matplotlib, flask, pydantic, pillow, requests…","They are Linux <span class='mono'>cp312</span> wheels &mdash; so develop/CI on Kaggle's exact Linux image."],
+      box:["note","Thanks to these wheels, calling <span class='mono'>Arcade(OFFLINE).make(game)</span> plays a game immediately &mdash; fully local."]},
+    arcengine:{path:"arc_agi_3_wheels/arcengine-0.9.3-…whl",badge:["lib","Game engine"],title:"arcengine &mdash; the game engine",
+      p:"A sprite-based 2D engine. Defines the low-level game rules and the core data types.",
+      li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 (keys), ACTION6 (click x,y), ACTION7 (undo).","<b>FrameData</b> &mdash; the 64&times;64 grid, state, levels_completed, available_actions.","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
+    arcagi:{path:"arc_agi_3_wheels/arc_agi-0.9.8-…whl",badge:["lib","Wrapper + scoring"],title:"arc_agi &mdash; the wrapper &amp; scorecard",
+      p:"The middle layer between agent and engine: loads games, runs local or remote, and computes the score.",
+      li:["<b>Arcade / OperationMode</b> &mdash; OFFLINE, NORMAL, ONLINE, COMPETITION.","<b>LocalEnvironmentWrapper</b> &mdash; keeps <span class='mono'>_game</span> alive in RAM (the key to the strategy).","<b>EnvironmentScoreCalculator</b> &mdash; the RHAE formula: <span class='mono'>min(1.15, (h/a)²)</span>."],
+      box:["note","The scorecard only updates on <span class='mono'>wrapper.step()</span> &rarr; trying moves on a <span class='mono'>deepcopy</span> is <b>free</b>."]},
+    otherwheels:{path:"arc_agi_3_wheels/*.whl",badge:["lib","Dependencies"],title:"The dependency wheels",
+      p:"The base libraries arcengine/arc_agi need.",
+      li:["numpy (grid math), pydantic (data types), pillow/matplotlib (images/plots), flask/requests…","All available to install offline.","Notably: <b>no</b> deep-learning library (torch) in this set."]},
+    envfiles:{path:"environment_files/",badge:["game","25 sample games"],title:"environment_files/ &mdash; the public games",
+      p:"25 sample games, one subfolder each. This is a &ldquo;practice &amp; test&rdquo; set, not data to memorize.",
+      li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on <b>55 private games</b> &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
+    onegame:{path:"environment_files/ls20/9607627b/",badge:["game","One game"],title:"A single game folder",
+      p:"Each game (ls20, cd82, re86, vc33…) is a folder with the game code + metadata.",
+      li:["Sizes vary widely: from cd82 ~34 KB up to ka59 ~831 KB.","Some are keyboard-controlled, some click-controlled, some both."]},
+    gamepy:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/&lt;id&gt;.py",badge:["game","Game code (obfuscated)"],title:"&lt;id&gt;.py &mdash; the game's code",
+      p:"An <span class='mono'>ARCBaseGame</span> subclass: sprites, levels, camera, and the logic for handling actions + win conditions.",
+      li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most games are deterministic, no RNG &rarr; <span class='mono'>deepcopy</span> reproduces them exactly."],
+      box:["note","Because the game is deterministic &amp; in RAM, we turn it into a &ldquo;perfect simulator&rdquo; to find the optimal solution before playing for real."]},
+    metadata:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/metadata.json",badge:["game","Game metadata"],title:"metadata.json &mdash; the accompanying info",
+      p:"A short description of the game.",
+      li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the baseline move count per level (≈ the human count h); ranges from ~8 to <b>578</b>."],
+      box:["note","baseline_actions is exactly the <span class='mono'>h</span> used to score RHAE and to set the <span class='mono'>5&times;h</span> search budget per level."]},
+  };
+  const treeEl=document.getElementById('fld-tree'), detailEl=document.getElementById('fld-detail');
+  if(!treeEl||!detailEl) return;
+  function render(id){
+    const d=data[id]; if(!d)return;
+    treeEl.querySelectorAll('.node').forEach(n=>n.classList.toggle('on',n.dataset.id===id));
+    let html='<div class="dpath">'+d.path+'</div><h3>'+d.title+'</h3>'+
+      '<span class="badge '+d.badge[0]+'">'+d.badge[1]+'</span>'+
+      '<p>'+d.p+'</p>';
+    if(d.li) html+='<ul>'+d.li.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+    if(d.box) html+='<div class="compbox '+d.box[0]+'">'+d.box[1]+'</div>';
+    detailEl.innerHTML=html;
+  }
+  treeEl.addEventListener('click',e=>{const n=e.target.closest('.node'); if(n)render(n.dataset.id);});
+  render('root');
+})();
+</script>
 </body>
 </html>

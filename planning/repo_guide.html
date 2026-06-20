@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Repo guide · arc-prize-2026-arc-agi-3</title>
+<style>
+  :root{
+    --bg:#0a0e16; --bg2:#0e131d; --surface:#141a26; --surface2:#1a2230;
+    --border:#26334a; --border2:#33425e;
+    --txt:#e8eef7; --txt2:#9fb0c7; --txt3:#6f8198;
+    --teal:#2dd4bf; --violet:#8b7bf0; --amber:#f5b860; --blue:#5aa9f0;
+    --green:#46c98b; --red:#f0726a; --gray:#7f8da3;
+    --radius:14px; --radius-sm:9px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1100px 650px at 78% -12%,#15203a 0%,var(--bg) 55%) fixed,var(--bg);
+    color:var(--txt);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+  a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .mono{font-family:var(--mono)}
+  header.top{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(10,14,22,.82);border-bottom:1px solid var(--border)}
+  .topin{display:flex;align-items:center;gap:11px;height:58px;font-weight:600}
+  .logo{width:30px;height:30px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:4px;background:linear-gradient(135deg,#1a2540,#101725);border:1px solid var(--border2)}
+  .logo i{border-radius:2px;background:var(--surface2)}
+  .logo i:nth-child(1){background:var(--teal)}.logo i:nth-child(5){background:var(--violet)}.logo i:nth-child(9){background:var(--amber)}
+  .top .path{color:var(--txt3);font-family:var(--mono);font-size:13px;margin-left:auto}
+
+  .hero{padding:46px 0 22px}
+  .eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  h1{font-size:clamp(27px,4.5vw,42px);line-height:1.12;margin:13px 0 10px;font-weight:700;letter-spacing:-.4px}
+  h1 .grad{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--txt2);font-size:17px;max-width:780px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--txt2);background:var(--surface);border:1px solid var(--border);padding:5px 11px;border-radius:999px}
+  .lg b{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+  h2{font-size:23px;font-weight:700;margin:38px 0 4px;letter-spacing:-.3px}
+  .lead{color:var(--txt2);font-size:15.5px;margin:0 0 20px;max-width:800px}
+
+  .explorer{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+  @media(max-width:780px){.explorer{grid-template-columns:1fr}}
+  .tree{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 10px;font-family:var(--mono);font-size:13px}
+  .node{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:7px;cursor:pointer;color:var(--txt2);white-space:nowrap;transition:.12s}
+  .node:hover{background:var(--surface2);color:var(--txt)}
+  .node.on{background:rgba(45,212,191,.12);color:var(--teal)}
+  .node .em{flex:none;width:16px;text-align:center}
+  .node .nm{overflow:hidden;text-overflow:ellipsis}
+  .node .dotb{width:7px;height:7px;border-radius:50%;flex:none;margin-left:auto}
+  .ind1{padding-left:22px}.ind2{padding-left:40px}.ind3{padding-left:58px}
+  .grp{color:var(--txt3);font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:10px 9px 4px}
+
+  .detail{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;min-height:340px}
+  .detail .dpath{font-family:var(--mono);font-size:13px;color:var(--txt3);word-break:break-all}
+  .detail h3{font-size:21px;margin:8px 0 6px;font-weight:700}
+  .detail .badge{display:inline-block;font-size:12px;font-weight:600;padding:4px 11px;border-radius:7px;margin-bottom:14px}
+  .detail p{color:var(--txt2);font-size:15px;margin:0 0 12px}
+  .detail ul{margin:0 0 14px;padding-left:0;list-style:none}
+  .detail li{color:var(--txt2);font-size:14.5px;padding:5px 0 5px 24px;position:relative}
+  .detail li:before{content:"›";position:absolute;left:6px;top:4px;color:var(--teal);font-weight:700}
+  .detail li b{color:var(--txt)}
+  .compbox{margin-top:6px;border-radius:var(--radius-sm);padding:13px 15px;font-size:13.5px;border:1px solid}
+  .compbox.keep{background:rgba(70,201,139,.07);border-color:rgba(70,201,139,.3);color:#bfe9d3}
+  .compbox.kill{background:rgba(240,114,106,.07);border-color:rgba(240,114,106,.3);color:#f3c2bf}
+  .compbox.note{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.3);color:#bdeae3}
+  .compbox b{color:#fff}
+  .badge.keep{background:rgba(70,201,139,.16);color:var(--green)}
+  .badge.kill{background:rgba(240,114,106,.16);color:var(--red)}
+  .badge.lib{background:rgba(45,212,191,.16);color:var(--teal)}
+  .badge.game{background:rgba(139,123,240,.16);color:var(--violet)}
+  .badge.cfg{background:rgba(127,141,163,.16);color:var(--gray)}
+
+  /* flow */
+  .flow{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .fstep{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 15px;position:relative}
+  .fstep .fn{font-family:var(--mono);font-size:12px;color:var(--teal)}
+  .fstep .ft{font-weight:600;font-size:14.5px;margin:4px 0 4px}
+  .fstep .fd{color:var(--txt2);font-size:13px}
+  .farrow{display:flex;align-items:center;color:var(--txt3);font-size:22px;padding:0 6px}
+  @media(max-width:780px){.farrow{transform:rotate(90deg);justify-content:center;width:100%;padding:4px 0}}
+
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(235px,1fr))}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:17px 19px}
+  .card h3{margin:0 0 6px;font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .card p{margin:0;color:var(--txt2);font-size:14px}
+  .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex:none;background:var(--surface2);border:1px solid var(--border2)}
+
+  footer{border-top:1px solid var(--border);margin-top:48px;padding:24px 0 48px;color:var(--txt3);font-size:13px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<h2 class="sr">A guide to the arc-prize-2026-arc-agi-3 folder structure: three main blocks, the key files, and how a single game runs.</h2>
+
+<header class="top"><div class="wrap topin">
+  <span class="logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+  Repo guide
+  <span class="path">arc-prize-2026-arc-agi-3/</span>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Competition resource kit · ARC-AGI-3</div>
+    <h1>Inside the <span class="grad">arc-prize-2026-arc-agi-3</span> folder</h1>
+    <p class="sub">This is the competition's entire toolkit: the official agent framework, the libraries that run games
+      <b>offline, right on your machine</b>, and 25 sample games. Click any item in the file tree for a detailed
+      explanation.</p>
+    <div class="legend">
+      <span class="lg"><b style="background:var(--green)"></b> Core &mdash; keep</span>
+      <span class="lg"><b style="background:var(--red)"></b> Dead offline</span>
+      <span class="lg"><b style="background:var(--teal)"></b> Offline runtime library</span>
+      <span class="lg"><b style="background:var(--violet)"></b> Game (obfuscated code)</span>
+      <span class="lg"><b style="background:var(--gray)"></b> Config / other</span>
+    </div>
+  </div>
+
+  <h2>Explore the file tree</h2>
+  <p class="lead">Three big blocks: <span class="mono">ARC-AGI-3-Agents/</span> (agent code),
+    <span class="mono">arc_agi_3_wheels/</span> (libraries), and <span class="mono">environment_files/</span> (games).</p>
+
+  <div class="explorer">
+    <div class="tree" id="tree">
+      <div class="node on" data-id="root"><span class="em">&#128193;</span><span class="nm">arc-prize-2026-arc-agi-3/</span></div>
+
+      <div class="grp">1 · Agent framework</div>
+      <div class="node ind1" data-id="sdk"><span class="em">&#128193;</span><span class="nm">ARC-AGI-3-Agents/</span></div>
+      <div class="node ind2" data-id="agentsdir"><span class="em">&#128193;</span><span class="nm">agents/</span></div>
+      <div class="node ind3" data-id="agentpy"><span class="em">&#128196;</span><span class="nm">agent.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="swarmpy"><span class="em">&#128196;</span><span class="nm">swarm.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="recorderpy"><span class="em">&#128196;</span><span class="nm">recorder.py</span><span class="dotb" style="background:var(--green)"></span></div>
+      <div class="node ind3" data-id="initpy"><span class="em">&#128196;</span><span class="nm">__init__.py</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind3" data-id="tracingpy"><span class="em">&#128196;</span><span class="nm">tracing.py</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind3" data-id="templates"><span class="em">&#128193;</span><span class="nm">templates/</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind2" data-id="mainpy"><span class="em">&#128196;</span><span class="nm">main.py</span><span class="dotb" style="background:var(--red)"></span></div>
+      <div class="node ind2" data-id="envex"><span class="em">&#9881;</span><span class="nm">.env.example</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind2" data-id="pyproject"><span class="em">&#9881;</span><span class="nm">pyproject.toml</span><span class="dotb" style="background:var(--gray)"></span></div>
+      <div class="node ind2" data-id="tests"><span class="em">&#128193;</span><span class="nm">tests/</span><span class="dotb" style="background:var(--gray)"></span></div>
+
+      <div class="grp">2 · Offline libraries</div>
+      <div class="node ind1" data-id="wheels"><span class="em">&#128193;</span><span class="nm">arc_agi_3_wheels/</span></div>
+      <div class="node ind2" data-id="arcengine"><span class="em">&#128230;</span><span class="nm">arcengine-0.9.3.whl</span><span class="dotb" style="background:var(--teal)"></span></div>
+      <div class="node ind2" data-id="arcagi"><span class="em">&#128230;</span><span class="nm">arc_agi-0.9.8.whl</span><span class="dotb" style="background:var(--teal)"></span></div>
+      <div class="node ind2" data-id="otherwheels"><span class="em">&#128230;</span><span class="nm">numpy, pydantic, pillow…</span><span class="dotb" style="background:var(--teal)"></span></div>
+
+      <div class="grp">3 · Sample games</div>
+      <div class="node ind1" data-id="envfiles"><span class="em">&#128193;</span><span class="nm">environment_files/</span></div>
+      <div class="node ind2" data-id="onegame"><span class="em">&#128193;</span><span class="nm">ls20/ &middot; cd82/ &middot; … (25 games)</span></div>
+      <div class="node ind3" data-id="gamepy"><span class="em">&#128196;</span><span class="nm">&lt;id&gt;.py</span><span class="dotb" style="background:var(--violet)"></span></div>
+      <div class="node ind3" data-id="metadata"><span class="em">&#128196;</span><span class="nm">metadata.json</span><span class="dotb" style="background:var(--violet)"></span></div>
+    </div>
+
+    <div class="detail" id="detail"></div>
+  </div>
+
+  <h2>How does a game run?</h2>
+  <p class="lead">The entire lifecycle runs <b>right inside your machine's Python process</b> &mdash; no internet, no server.</p>
+  <div class="flow">
+    <div class="fstep"><div class="fn">Arcade.make()</div><div class="ft">Load game</div><div class="fd">Reads <span class="mono">&lt;id&gt;.py</span> from disk, builds the live <span class="mono">_game</span> object.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">Agent.main()</div><div class="ft">Loop</div><div class="fd">Loops until WIN: calls <span class="mono">choose_action()</span>.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">step(action)</div><div class="ft">Act</div><div class="fd">Sends one move (a key, or a click at x,y).</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">FrameData</div><div class="ft">Observe</div><div class="fd">64&times;64 grid, <span class="mono">state</span>, <span class="mono">levels_completed</span>, <span class="mono">available_actions</span>.</div></div>
+    <div class="farrow">&#10142;</div>
+    <div class="fstep"><div class="fn">scorecard</div><div class="ft">Score</div><div class="fd">Counts actions to compute the RHAE score.</div></div>
+  </div>
+
+  <h2>The 4 most important takeaways from this folder</h2>
+  <div class="grid">
+    <div class="card"><h3><span class="ic">&#128268;</span>Offline = LLMs are dead</h3><p>The entire <span class="mono">templates/</span> folder calls external APIs (OpenAI…). With <b>no internet</b> at eval, drop them; keep only the framework in <span class="mono">agent.py</span>.</p></div>
+    <div class="card"><h3><span class="ic">&#129518;</span>Game = perfect simulator</h3><p>The <span class="mono">_game</span> object lives in RAM &rarr; you can <span class="mono">deepcopy</span> it to try moves <b>for free</b>, find the optimal solution, then play for real.</p></div>
+    <div class="card"><h3><span class="ic">&#9888;</span>MAX_ACTIONS = 80 is too low</h3><p>The template default allows only 80 moves; real games need up to <b>578</b>. Raise it to the rule's <span class="mono">5&times;h</span>.</p></div>
+    <div class="card"><h3><span class="ic">&#128272;</span>Game code is obfuscated</h3><p>Variable names in <span class="mono">&lt;id&gt;.py</span> are randomized &mdash; <b>you can't read the rules</b>; the agent must learn by playing. These 25 games are for practice, not memorization.</p></div>
+  </div>
+</main>
+
+<footer class="wrap">
+  Repo guide for <span class="mono">arc-prize-2026-arc-agi-3</span> · SJSU CMPE 295A Group 2 ·
+  See the full strategy in <span class="mono">master_plan.md</span> (and the live site <span class="mono">index.html</span>).
+</footer>
+
+<script>
+const data={
+  root:{path:"arc-prize-2026-arc-agi-3/",badge:["cfg","Root folder"],title:"The competition's root folder",
+    p:"Everything you need to build an ARC-AGI-3 agent. Three blocks: agent code, offline runtime libraries, and sample games.",
+    li:["<b>ARC-AGI-3-Agents/</b> &mdash; the official framework (SDK) for writing agents.","<b>arc_agi_3_wheels/</b> &mdash; <span class='mono'>.whl</span> libraries to run games locally, no internet needed.","<b>environment_files/</b> &mdash; 25 public games (each is one Python file + one metadata file)."],
+    box:["note","Goal: from this folder, build an agent that explores &amp; solves <b>never-before-seen</b> games on its own &mdash; offline, within 9 hours on a single RTX 6000 GPU."]},
+
+  sdk:{path:"ARC-AGI-3-Agents/",badge:["keep","Agent framework"],title:"The official agent SDK",
+    p:"A clone of ARC Prize's official repo. Contains the abstract Agent class, a multi-game orchestrator, record/replay tooling, and many sample templates.",
+    li:["Usable at eval: <b>agent.py</b>, <b>swarm.py</b>, <b>recorder.py</b>.","Dropped at eval: <b>main.py</b> and the entire <b>templates/</b> LLM family (need internet)."],
+    box:["keep","We subclass the <span class='mono'>Agent</span> class here and override two methods: <span class='mono'>choose_action()</span> and <span class='mono'>is_done()</span>."]},
+
+  agentsdir:{path:"ARC-AGI-3-Agents/agents/",badge:["keep","Main code package"],title:"The agents/ package",
+    p:"The heart of the SDK. A Python package holding the base class and the templates.",
+    li:["<b>agent.py</b> &mdash; the <span class='mono'>Agent</span> + <span class='mono'>Playback</span> classes.","<b>swarm.py</b> &mdash; runs many agents/games in parallel.","<b>recorder.py</b> &mdash; record &amp; replay runs (JSONL).","<b>templates/</b> &mdash; sample agents (mostly LLM-based)."]},
+
+  agentpy:{path:"agents/agent.py",badge:["keep","Core &mdash; most important"],title:"agent.py &mdash; the Agent class",
+    p:"The most important file. Defines the main loop and the two extension points we must write ourselves.",
+    li:["<b>Main loop:</b> repeats <span class='mono'>choose_action &rarr; take_action &rarr; append_frame</span> until win or out of moves.","<b>choose_action()</b> &mdash; the brain: picks the next action.","<b>is_done()</b> &mdash; the stop condition (usually <span class='mono'>state == WIN</span>).","The <span class='mono'>arc_env</span> object is passed in &mdash; the &ldquo;handle&rdquo; to the live game."],
+    box:["note","⚠️ The <span class='mono'>MAX_ACTIONS = 80</span> constant here is far too low for real games &mdash; it must be raised."]},
+
+  swarmpy:{path:"agents/swarm.py",badge:["keep","Orchestration"],title:"swarm.py &mdash; the orchestrator",
+    p:"Builds many agents (one per game) on separate threads, opening/closing the scorecard.",
+    li:["Builds <span class='mono'>Arcade()</span> then calls <span class='mono'>.make(game)</span> per game.","Defaults to NORMAL mode (local + API) &rarr; at eval we must force <b>OFFLINE</b>.","The <span class='mono'>Arcade.make(...)</span> wiring is well worth reusing."]},
+
+  recorderpy:{path:"agents/recorder.py",badge:["keep","Record / replay"],title:"recorder.py &mdash; the run recorder",
+    p:"Logs every frame &amp; action to a JSONL file; the Playback class replays them exactly.",
+    li:["This is the &ldquo;human replay = 100%&rdquo; harness the organizers mention.","Used as: the run data format + a determinism sanity tool.","Note: replaying recorded moves scores <b>0</b> on a new game (it doesn't generalize)."]},
+
+  initpy:{path:"agents/__init__.py",badge:["cfg","Registry"],title:"__init__.py &mdash; the agent registry",
+    p:"Auto-collects every Agent subclass into the <span class='mono'>AVAILABLE_AGENTS</span> list.",
+    li:["⚠️ It <b>eagerly imports</b> every template (openai, langgraph, smolagents).","On an offline machine these imports can crash &rarr; at eval, <b>don't import this file</b>; register only our own agent."]},
+
+  tracingpy:{path:"agents/tracing.py",badge:["kill","Optional / drop"],title:"tracing.py &mdash; AgentOps tracing",
+    p:"A decorator that traces runs to AgentOps (an external service).",
+    li:["Only for observability/debugging during development.","Needs internet &rarr; drop from the submission."]},
+
+  templates:{path:"agents/templates/",badge:["kill","Dead offline"],title:"templates/ &mdash; sample agents",
+    p:"A collection of sample agents: random, LLM variants, LangGraph, smolagents, multimodal…",
+    li:["<b>random_agent.py</b> &mdash; still usable (a baseline to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_*.py</b> &mdash; all call external LLM APIs."],
+    box:["kill","With no internet at eval, this whole LLM family is useless &mdash; delete it from the submission. Keep only the idea of the action/observation format."]},
+
+  mainpy:{path:"ARC-AGI-3-Agents/main.py",badge:["kill","Online only"],title:"main.py &mdash; the online runner",
+    p:"The default entrypoint: fetches the game list over HTTP from <span class='mono'>three.arcprize.org</span>.",
+    li:["Hard-depends on the network &rarr; offline it finds &ldquo;no games&rdquo; and exits.","At eval: replace with our own entrypoint using <span class='mono'>Arcade(OFFLINE)</span> to scan <span class='mono'>environment_files/</span>."]},
+
+  envex:{path:"ARC-AGI-3-Agents/.env.example",badge:["cfg","Config"],title:".env.example &mdash; sample config",
+    p:"Sample environment variables: server, API keys, run mode.",
+    li:["Points at <span class='mono'>three.arcprize.org</span>, with <span class='mono'>OPENAI_API_KEY</span>, <span class='mono'>ARC_API_KEY</span>.","Has an <span class='mono'>OPERATION_MODE</span> flag &mdash; we set it to <b>offline</b>."]},
+
+  pyproject:{path:"ARC-AGI-3-Agents/pyproject.toml",badge:["cfg","Config"],title:"pyproject.toml &mdash; package manifest",
+    p:"Lists dependencies: arc-agi, openai, langchain, langgraph, smolagents, numpy, pydantic, pillow…",
+    li:["Shows the project's original library set.","Note: <b>no torch/tensorflow</b> &mdash; if you need a neural net, you must self-package a CUDA wheel."]},
+
+  tests:{path:"ARC-AGI-3-Agents/tests/",badge:["cfg","Tests"],title:"tests/ &mdash; the test suite",
+    p:"Unit tests for the core, recorder, and swarm.",
+    li:["<span class='mono'>test_core.py</span>, <span class='mono'>test_recorder.py</span>, <span class='mono'>test_swarm.py</span>.","Handy for understanding the SDK's expected behavior."]},
+
+  wheels:{path:"arc_agi_3_wheels/",badge:["lib","Offline libraries"],title:"arc_agi_3_wheels/ &mdash; offline install libraries",
+    p:"~30 <span class='mono'>.whl</span> files to install with no internet. This is what lets games run directly on your machine.",
+    li:["Two core libraries: <b>arcengine</b> (the game engine) &amp; <b>arc_agi</b> (the wrapper + scoring).","Plus numpy, matplotlib, flask, pydantic, pillow, requests…","They are Linux <span class='mono'>cp312</span> wheels &mdash; so develop/CI on Kaggle's exact Linux image."],
+    box:["note","Thanks to these wheels, calling <span class='mono'>Arcade(OFFLINE).make(game)</span> plays a game immediately &mdash; fully local."]},
+
+  arcengine:{path:"arc_agi_3_wheels/arcengine-0.9.3-…whl",badge:["lib","Game engine"],title:"arcengine &mdash; the game engine",
+    p:"A sprite-based 2D engine. Defines the low-level game rules and the core data types.",
+    li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 (keys), ACTION6 (click x,y), ACTION7 (undo).","<b>FrameData</b> &mdash; the 64&times;64 grid, state, levels_completed, available_actions.","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
+
+  arcagi:{path:"arc_agi_3_wheels/arc_agi-0.9.8-…whl",badge:["lib","Wrapper + scoring"],title:"arc_agi &mdash; the wrapper &amp; scorecard",
+    p:"The middle layer between agent and engine: loads games, runs local or remote, and computes the score.",
+    li:["<b>Arcade / OperationMode</b> &mdash; OFFLINE, NORMAL, ONLINE, COMPETITION.","<b>LocalEnvironmentWrapper</b> &mdash; keeps <span class='mono'>_game</span> alive in RAM (the key to the strategy).","<b>EnvironmentScoreCalculator</b> &mdash; the RHAE formula: <span class='mono'>min(1.15, (h/a)²)</span>."],
+    box:["note","The scorecard only updates on <span class='mono'>wrapper.step()</span> &rarr; trying moves on a <span class='mono'>deepcopy</span> is <b>free</b>."]},
+
+  otherwheels:{path:"arc_agi_3_wheels/*.whl",badge:["lib","Dependencies"],title:"The dependency wheels",
+    p:"The base libraries arcengine/arc_agi need.",
+    li:["numpy (grid math), pydantic (data types), pillow/matplotlib (images/plots), flask/requests…","All available to install offline.","Notably: <b>no</b> deep-learning library (torch) in this set."]},
+
+  envfiles:{path:"environment_files/",badge:["game","25 sample games"],title:"environment_files/ &mdash; the public games",
+    p:"25 sample games, one subfolder each. This is a &ldquo;practice &amp; test&rdquo; set, not data to memorize.",
+    li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on <b>55 private games</b> &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
+
+  onegame:{path:"environment_files/ls20/9607627b/",badge:["game","One game"],title:"A single game folder",
+    p:"Each game (ls20, cd82, re86, vc33…) is a folder with the game code + metadata.",
+    li:["Sizes vary widely: from cd82 ~34 KB up to ka59 ~831 KB.","Some are keyboard-controlled, some click-controlled, some both."]},
+
+  gamepy:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/&lt;id&gt;.py",badge:["game","Game code (obfuscated)"],title:"&lt;id&gt;.py &mdash; the game's code",
+    p:"An <span class='mono'>ARCBaseGame</span> subclass: sprites, levels, camera, and the logic for handling actions + win conditions.",
+    li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most games are deterministic, no RNG &rarr; <span class='mono'>deepcopy</span> reproduces them exactly."],
+    box:["note","Because the game is deterministic &amp; in RAM, we turn it into a &ldquo;perfect simulator&rdquo; to find the optimal solution before playing for real."]},
+
+  metadata:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/metadata.json",badge:["game","Game metadata"],title:"metadata.json &mdash; the accompanying info",
+    p:"A short description of the game.",
+    li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the baseline move count per level (≈ the human count h); ranges from ~8 to <b>578</b>."],
+    box:["note","baseline_actions is exactly the <span class='mono'>h</span> used to score RHAE and to set the <span class='mono'>5&times;h</span> search budget per level."]},
+};
+
+const tree=document.getElementById('tree'), detail=document.getElementById('detail');
+function render(id){
+  const d=data[id]; if(!d)return;
+  document.querySelectorAll('.node').forEach(n=>n.classList.toggle('on',n.dataset.id===id));
+  let html='<div class="dpath">'+d.path+'</div><h3>'+d.title+'</h3>'+
+    '<span class="badge '+d.badge[0]+'">'+d.badge[1]+'</span>'+
+    '<p>'+d.p+'</p>';
+  if(d.li) html+='<ul>'+d.li.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  if(d.box) html+='<div class="compbox '+d.box[0]+'">'+d.box[1]+'</div>';
+  detail.innerHTML=html;
+}
+tree.addEventListener('click',e=>{const n=e.target.closest('.node'); if(n)render(n.dataset.id);});
+render('root');
+</script>
+</body>
+</html>
