@@ -221,7 +221,7 @@ const data={
 
   templates:{path:"agents/templates/",badge:["kill","Dead offline"],title:"templates/ &mdash; sample agents",
     p:"A collection of sample agents: random, LLM variants, LangGraph, smolagents, multimodal…",
-    li:["<b>random_agent.py</b> &mdash; still usable (a baseline to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_*.py</b> &mdash; all call external LLM APIs."],
+    li:["<b>random_agent.py</b> &amp; <b>langgraph_random_agent.py</b> &mdash; still usable (no LLM; baselines to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_functional_agent.py</b> &mdash; all call external LLM APIs."],
     box:["kill","With no internet at eval, this whole LLM family is useless &mdash; delete it from the submission. Keep only the idea of the action/observation format."]},
 
   mainpy:{path:"ARC-AGI-3-Agents/main.py",badge:["kill","Online only"],title:"main.py &mdash; the online runner",
@@ -238,7 +238,7 @@ const data={
 
   tests:{path:"ARC-AGI-3-Agents/tests/",badge:["cfg","Tests"],title:"tests/ &mdash; the test suite",
     p:"Unit tests for the core, recorder, and swarm.",
-    li:["<span class='mono'>test_core.py</span>, <span class='mono'>test_recorder.py</span>, <span class='mono'>test_swarm.py</span>.","Handy for understanding the SDK's expected behavior."]},
+    li:["<span class='mono'>tests/unit/test_core.py</span>, <span class='mono'>tests/unit/test_recorder.py</span>, <span class='mono'>tests/unit/test_swarm.py</span> (+ <span class='mono'>conftest.py</span>).","Handy for understanding the SDK's expected behavior."]},
 
   wheels:{path:"arc_agi_3_wheels/",badge:["lib","Offline libraries"],title:"arc_agi_3_wheels/ &mdash; offline install libraries",
     p:"~30 <span class='mono'>.whl</span> files to install with no internet. This is what lets games run directly on your machine.",
@@ -247,12 +247,12 @@ const data={
 
   arcengine:{path:"arc_agi_3_wheels/arcengine-0.9.3-…whl",badge:["lib","Game engine"],title:"arcengine &mdash; the game engine",
     p:"A sprite-based 2D engine. Defines the low-level game rules and the core data types.",
-    li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 (keys), ACTION6 (click x,y), ACTION7 (undo).","<b>FrameData</b> &mdash; the 64&times;64 grid, state, levels_completed, available_actions.","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
+    li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 &amp; ACTION7 (simple/key actions), ACTION6 (ComplexAction: click x,y in 0..63).","<b>FrameData</b> &mdash; frame (the grid, up to 64&times;64), state, levels_completed, win_levels, available_actions (+ action_input, guid).","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
 
   arcagi:{path:"arc_agi_3_wheels/arc_agi-0.9.8-…whl",badge:["lib","Wrapper + scoring"],title:"arc_agi &mdash; the wrapper &amp; scorecard",
     p:"The middle layer between agent and engine: loads games, runs local or remote, and computes the score.",
     li:["<b>Arcade / OperationMode</b> &mdash; OFFLINE, NORMAL, ONLINE, COMPETITION.","<b>LocalEnvironmentWrapper</b> &mdash; keeps <span class='mono'>_game</span> alive in RAM (the key to the strategy).","<b>EnvironmentScoreCalculator</b> &mdash; the RHAE formula: <span class='mono'>min(1.15, (h/a)²)</span>."],
-    box:["note","The scorecard only updates on <span class='mono'>wrapper.step()</span> &rarr; trying moves on a <span class='mono'>deepcopy</span> is <b>free</b>."]},
+    box:["note","The scorecard only updates through the real wrapper (its reset()/step() path) &rarr; a <span class='mono'>deepcopy</span> of the game never goes through it, so trying moves on the copy is <b>free</b>."]},
 
   otherwheels:{path:"arc_agi_3_wheels/*.whl",badge:["lib","Dependencies"],title:"The dependency wheels",
     p:"The base libraries arcengine/arc_agi need.",
@@ -260,7 +260,7 @@ const data={
 
   envfiles:{path:"environment_files/",badge:["game","25 sample games"],title:"environment_files/ &mdash; the public games",
     p:"25 sample games, one subfolder each. This is a &ldquo;practice &amp; test&rdquo; set, not data to memorize.",
-    li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on <b>55 private games</b> &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
+    li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on a separate, hidden set of <b>110 games</b> (half feeding the Public Leaderboard, half the Private) &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
 
   onegame:{path:"environment_files/ls20/9607627b/",badge:["game","One game"],title:"A single game folder",
     p:"Each game (ls20, cd82, re86, vc33…) is a folder with the game code + metadata.",
@@ -268,12 +268,12 @@ const data={
 
   gamepy:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/&lt;id&gt;.py",badge:["game","Game code (obfuscated)"],title:"&lt;id&gt;.py &mdash; the game's code",
     p:"An <span class='mono'>ARCBaseGame</span> subclass: sprites, levels, camera, and the logic for handling actions + win conditions.",
-    li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most games are deterministic, no RNG &rarr; <span class='mono'>deepcopy</span> reproduces them exactly."],
+    li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most (23/25) are deterministic with no RNG. Exceptions: <span class='mono'>tr87</span> uses a per-level <b>seeded</b> RNG (reproducible); <span class='mono'>lf52</span> shuffles once with global <b>unseeded</b> <span class='mono'>np.random</span> at construction &rarr; prefer <span class='mono'>deepcopy</span> over re-instantiation."],
     box:["note","Because the game is deterministic &amp; in RAM, we turn it into a &ldquo;perfect simulator&rdquo; to find the optimal solution before playing for real."]},
 
   metadata:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/metadata.json",badge:["game","Game metadata"],title:"metadata.json &mdash; the accompanying info",
     p:"A short description of the game.",
-    li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the baseline move count per level (≈ the human count h); ranges from ~8 to <b>578</b>."],
+    li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the per-level baseline move count (≈ the human count h); ranges from <b>6</b> to <b>578</b> across the 25 games."],
     box:["note","baseline_actions is exactly the <span class='mono'>h</span> used to score RHAE and to set the <span class='mono'>5&times;h</span> search budget per level."]},
 };
 

@@ -8,7 +8,7 @@ ARC-AGI-3 Overview:
 Create AI agent to play simple video game with no user input
 Must figure out rules, goal, and strategy by itself
 Simple 2D grids with 64x64 cells, cell values are 0-15 representing colors/states
-7 actions (up/down/left/right, interact, click, undo)
+7 actions (up/down/left/right, interact, click, and a 7th simple action)
 No internet allowed (only local LLMs)
 
 Things we can work on:

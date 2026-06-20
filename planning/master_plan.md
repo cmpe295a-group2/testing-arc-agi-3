@@ -41,7 +41,7 @@ We are building an **autonomous agent** that, dropped into a never‑before‑se
 | Compute | ≤ **9 hours**, single **RTX 6000 (Ada, 48 GB)**‑class GPU |
 | Datasets | 25 public demo · 55 semi‑private · **55 fully‑private (scored)**, >1000 levels |
 | Observation | one or more **64×64 grids**, each cell ∈ {0..15} (16 colors); a frame may be a short animation sequence |
-| Actions | `RESET` + `ACTION1..5` (keys) + `ACTION6` (click x,y ∈ 0..63) + `ACTION7` (undo) — each game uses a **subset** |
+| Actions | `RESET` + `ACTION1..5` (keys) + `ACTION6` (click x,y ∈ 0..63) + `ACTION7` (a 7th simple action) — each game uses a **subset** |
 | Win | complete **all levels** (≥6/env; level 1 is an easy tutorial); difficulty grows by **composition** |
 | Prizes | **$700K** Grand (first to 100%) · $75K Top Score · $75K Milestones (**Jun 30** & **Sep 30 2026**); winners open‑source under **CC0/MIT‑0** |
 | Status quo (⚠️ report) | humans 100%; Opus 4.6 0.50%, Gemini 3.1 Pro 0.40%, GPT 5.4 0.20%, Grok 4.20 0.10% (official, no harness). Preview community: non‑LLM CNN 12.58%, state‑graph agent 6.71%, LLMs ~3–4% |
@@ -310,7 +310,7 @@ Run on all 25 public games (and re‑run on the real Kaggle harness the moment a
 ### Phase 6 — Compute‑budget management (9 h / single RTX 6000) (continuous; locked Weeks 11–13)
 The binding constraint is **wall‑clock search time** (CPU‑bound; GPU mostly idle unless the CNN is active).
 1. **Global time governor** ≈ `9h / (N_envs × avg_levels)` → few‑hundred‑ms‑to‑few‑seconds per level; hard deadline returns best partial.
-2. **Make state copy cheap** — profile `deepcopy` (64×64 sprite arrays aren't free); prefer incremental save/restore or the engine **UNDO (ACTION7)** in hot loops; hash to avoid re‑expansion.
+2. **Make state copy cheap** — profile `deepcopy` (64×64 sprite arrays aren't free); prefer incremental save/restore of the engine's mutable state over a full deepcopy in hot loops (there is **no engine‑level undo** — `ACTION7` is just a 7th simple action); hash to avoid re‑expansion.
 3. **Allocate time by score leverage** — bias toward completing *later* levels (a failed later level zeroes subsequent weight).
 4. **Parallelize across envs** within the single‑GPU/CPU budget; cap per‑env time so one pathological env can't starve the rest.
 5. **Checkpoint** per‑env best trajectories so a near‑timeout run still submits best‑so‑far.
@@ -335,7 +335,7 @@ The binding constraint is **wall‑clock search time** (CPU‑bound; GPU mostly 
 | R3 | Hidden/global RNG in OOD envs breaks deepcopy/replay | Med | High | Unconditional `np.random`/`random` save‑restore guard; deepcopy‑only; adversarial synthetic tests. |
 | R4 | Search horizon explosion (baselines→578, 4096 clicks) | High | High | Subgoal decomposition, macro‑actions, learned heuristics/click proposer, time governor → best‑partial. |
 | R5 | Public‑overfit fails to transfer (private OOD) | High | High | Holdout‑7 gate, constant‑hunt audit, mechanic‑family ablation; engine‑level generality only. |
-| R6 | 9 h compute overrun | Med | High | Time governor, UNDO instead of deepcopy, per‑env caps, checkpointed best‑so‑far. |
+| R6 | 9 h compute overrun | Med | High | Time governor, incremental save/restore instead of full deepcopy, per‑env caps, checkpointed best‑so‑far. |
 | R7 | Offline DL packaging (no torch in wheels) fails on Kaggle | Med | Med | Prefer pure‑numpy proposer when GREEN; else pin CUDA wheel to the exact image and rehearse import offline. |
 | R8 | Goal discovery stalls on a novel mechanic | Med | High | Novelty‑guided explorer + dense `levels_completed` oracle; partial completion still scores. |
 | R9 | Linux/Windows / image drift (wheels are Linux cp312) | Low | Med | Develop/CI on the pinned Kaggle Linux image, not the Windows dev box. |

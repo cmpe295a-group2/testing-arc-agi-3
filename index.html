@@ -466,7 +466,7 @@
     <tr><td><b>Compute</b></td><td>&#8804; <b>9 hours</b>, single <b>RTX 6000 (Ada, 48 GB)</b>-class GPU</td></tr>
     <tr><td><b>Datasets</b></td><td>25 public demo · 55 semi-private · <b>55 fully-private (scored)</b> · &gt;1000 levels total</td></tr>
     <tr><td><b>Observation</b></td><td>One or more <b>64&#215;64 grids</b>, each cell &#8712; {0..15} (16 colors); a frame may be a short animation sequence</td></tr>
-    <tr><td><b>Actions</b></td><td><code>RESET</code> + <code>ACTION1..5</code> (keys) + <code>ACTION6</code> (click x,y &#8712; 0..63) + <code>ACTION7</code> (undo) — each game uses a <b>subset</b></td></tr>
+    <tr><td><b>Actions</b></td><td><code>RESET</code> + <code>ACTION1..5</code> (keys) + <code>ACTION6</code> (click x,y &#8712; 0..63) + <code>ACTION7</code> (a 7th simple action) — each game uses a <b>subset</b></td></tr>
     <tr><td><b>Win condition</b></td><td>Complete <b>all levels</b> (&#8805; 6 per env; level 1 is an easy tutorial); difficulty grows by <b>composition</b></td></tr>
     <tr><td><b>Prizes</b></td><td><b>$700K</b> Grand (first to 100%) · <b>$75K</b> Top Score · <b>$75K</b> Milestones (Jun 30 &amp; Sep 30 2026)</td></tr>
     <tr><td><b>License</b></td><td>Winners open-source under <b>CC0 / MIT-0</b></td></tr>
@@ -536,7 +536,7 @@
     <tr><td><code>RESET</code></td><td>Start or restart the game</td></tr>
     <tr><td><code>ACTION1 &#8211; ACTION5</code></td><td>Simple actions (e.g. move up / down / left / right, interact)</td></tr>
     <tr><td><code>ACTION6</code></td><td>Complex action requiring <code>(x, y)</code> coordinates — a <b>4096-wide</b> click branch (<code>x,y &#8712; 0..63</code>)</td></tr>
-    <tr><td><code>ACTION7</code></td><td>An additional simple action (in the engine it often maps to undo / step-back, usable as a cheap state restore)</td></tr>
+    <tr><td><code>ACTION7</code></td><td>An additional simple/key action — in the engine it is a plain <code>SimpleAction</code> (id 7), not a built-in undo; like every action, its effect is game-specific</td></tr>
   </table>
   </div>
   <p style="color:var(--txt2);font-size:14px;margin-top:14px">Internally the engine even knows which cells are
@@ -893,7 +893,7 @@
     <tr><td class="num">R3</td><td>Hidden/global RNG in OOD envs breaks deepcopy/replay</td><td class="num">Med / High</td><td>Unconditional <code>np.random</code>/<code>random</code> save-restore guard; deepcopy-only; adversarial synthetic tests</td></tr>
     <tr><td class="num">R4</td><td>Search horizon explosion (baselines &#8594; 578, 4096 clicks)</td><td class="num">High / High</td><td>Subgoal decomposition, macro-actions, learned heuristics/click proposer, time governor &#8594; best-partial</td></tr>
     <tr><td class="num">R5</td><td>Public-overfit fails to transfer to the private OOD set</td><td class="num">High / High</td><td>Holdout-7 gate, constant-hunt audit, mechanic-family ablation; engine-level generality only</td></tr>
-    <tr><td class="num">R6</td><td>9 h compute overrun</td><td class="num">Med / High</td><td>Time governor, UNDO instead of deepcopy in hot loops, per-env caps, checkpointed best-so-far</td></tr>
+    <tr><td class="num">R6</td><td>9 h compute overrun</td><td class="num">Med / High</td><td>Time governor, incremental save/restore instead of full deepcopy in hot loops, per-env caps, checkpointed best-so-far</td></tr>
     <tr><td class="num">R7</td><td>Offline DL packaging fails (no torch in the wheels)</td><td class="num">Med / Med</td><td>Prefer a pure-numpy proposer when GREEN; else pin a CUDA wheel to the exact image and rehearse import offline</td></tr>
   </table>
   </div>
@@ -1464,7 +1464,7 @@ const PHASES=[
   {n:'3',t:'Planner: search-then-execute',w:'Weeks 4–7',d:'Engine selection by horizon (BFS/IDDFS → best-first/A* → MCTS), heuristics derived from perception (not hardcoded), subgoal decomposition & macro-actions to tame depth, a compute-bounded search with best-partial fallback, and minimal execution.',e:'≥80% of dev-game levels completed end-to-end at ≤ baseline counts; measurable holdout completion.'},
   {n:'4',t:'Perception & world-model fallback',w:'Weeks 6–9',d:'A local CNN action-effect/click proposer (online per game), a learned deterministic world model as the RED fallback behind a feature flag, an only-if-needed offline GPU torch package, and dropping all VLM ideas.',e:'RED fallback runs end-to-end on ≥1 env; CNN proposer beats random click selection.'},
   {n:'5',t:'Generalization hardening',w:'Weeks 9–12',d:'A holdout-only promotion gate, a hunt-and-delete pass on env-specific constants, RNG-guard + deepcopy stress tests on adversarial synthetic envs, and a mechanic-family ablation without per-family code.',e:'Holdout-7 completion within a small stable gap of dev-18; zero hardcoded public constants.'},
-  {n:'6',t:'Compute-budget management',w:'Weeks 11–13',d:'A global time governor (~9h / envs×levels), cheap state copy (incremental save/restore or UNDO in hot loops), score-leverage allocation toward late levels, per-env caps, and checkpointed best-so-far.',e:'Full dry-run over 25 public envs completes within margin.'},
+  {n:'6',t:'Compute-budget management',w:'Weeks 11–13',d:'A global time governor (~9h / envs×levels), cheap state copy (incremental save/restore of engine state instead of a full deepcopy in hot loops), score-leverage allocation toward late levels, per-env caps, and checkpointed best-so-far.',e:'Full dry-run over 25 public envs completes within margin.'},
   {n:'7',t:'Submission packaging & open-source',w:'Weeks 12–13',d:'An offline notebook installing --no-index from bundled wheels, a self-contained OFFLINE harness, deterministic global seeding, a CC0/MIT-0 license, and an end-to-end rehearsal before each milestone.',e:'Notebook runs offline start-to-finish under budget, scores via the rig, license present.'},
 ];
 const phEl=document.getElementById('phases');
@@ -1508,7 +1508,7 @@ PHASES.forEach((p,i)=>{
       li:["Only for observability/debugging during development.","Needs internet &rarr; drop from the submission."]},
     templates:{path:"agents/templates/",badge:["kill","Dead offline"],title:"templates/ &mdash; sample agents",
       p:"A collection of sample agents: random, LLM variants, LangGraph, smolagents, multimodal…",
-      li:["<b>random_agent.py</b> &mdash; still usable (a baseline to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_*.py</b> &mdash; all call external LLM APIs."],
+      li:["<b>random_agent.py</b> &amp; <b>langgraph_random_agent.py</b> &mdash; still usable (no LLM; baselines to smoke-test the pipeline).","<b>llm_agents.py, reasoning_agent.py, multimodal.py, smolagents.py, langgraph_functional_agent.py</b> &mdash; all call external LLM APIs."],
       box:["kill","With no internet at eval, this whole LLM family is useless &mdash; delete it from the submission. Keep only the idea of the action/observation format."]},
     mainpy:{path:"ARC-AGI-3-Agents/main.py",badge:["kill","Online only"],title:"main.py &mdash; the online runner",
       p:"The default entrypoint: fetches the game list over HTTP from <span class='mono'>three.arcprize.org</span>.",
@@ -1521,34 +1521,34 @@ PHASES.forEach((p,i)=>{
       li:["Shows the project's original library set.","Note: <b>no torch/tensorflow</b> &mdash; if you need a neural net, you must self-package a CUDA wheel."]},
     tests:{path:"ARC-AGI-3-Agents/tests/",badge:["cfg","Tests"],title:"tests/ &mdash; the test suite",
       p:"Unit tests for the core, recorder, and swarm.",
-      li:["<span class='mono'>test_core.py</span>, <span class='mono'>test_recorder.py</span>, <span class='mono'>test_swarm.py</span>.","Handy for understanding the SDK's expected behavior."]},
+      li:["<span class='mono'>tests/unit/test_core.py</span>, <span class='mono'>tests/unit/test_recorder.py</span>, <span class='mono'>tests/unit/test_swarm.py</span> (+ <span class='mono'>conftest.py</span>).","Handy for understanding the SDK's expected behavior."]},
     wheels:{path:"arc_agi_3_wheels/",badge:["lib","Offline libraries"],title:"arc_agi_3_wheels/ &mdash; offline install libraries",
       p:"~30 <span class='mono'>.whl</span> files to install with no internet. This is what lets games run directly on your machine.",
       li:["Two core libraries: <b>arcengine</b> (the game engine) &amp; <b>arc_agi</b> (the wrapper + scoring).","Plus numpy, matplotlib, flask, pydantic, pillow, requests…","They are Linux <span class='mono'>cp312</span> wheels &mdash; so develop/CI on Kaggle's exact Linux image."],
       box:["note","Thanks to these wheels, calling <span class='mono'>Arcade(OFFLINE).make(game)</span> plays a game immediately &mdash; fully local."]},
     arcengine:{path:"arc_agi_3_wheels/arcengine-0.9.3-…whl",badge:["lib","Game engine"],title:"arcengine &mdash; the game engine",
       p:"A sprite-based 2D engine. Defines the low-level game rules and the core data types.",
-      li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 (keys), ACTION6 (click x,y), ACTION7 (undo).","<b>FrameData</b> &mdash; the 64&times;64 grid, state, levels_completed, available_actions.","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
+      li:["<b>ARCBaseGame</b> &mdash; the base class every game inherits.","<b>GameAction</b> &mdash; RESET, ACTION1..5 &amp; ACTION7 (simple/key actions), ACTION6 (ComplexAction: click x,y in 0..63).","<b>FrameData</b> &mdash; frame (the grid, up to 64&times;64), state, levels_completed, win_levels, available_actions (+ action_input, guid).","<b>Sprite, Level, Camera</b> &mdash; the game-building components."]},
     arcagi:{path:"arc_agi_3_wheels/arc_agi-0.9.8-…whl",badge:["lib","Wrapper + scoring"],title:"arc_agi &mdash; the wrapper &amp; scorecard",
       p:"The middle layer between agent and engine: loads games, runs local or remote, and computes the score.",
       li:["<b>Arcade / OperationMode</b> &mdash; OFFLINE, NORMAL, ONLINE, COMPETITION.","<b>LocalEnvironmentWrapper</b> &mdash; keeps <span class='mono'>_game</span> alive in RAM (the key to the strategy).","<b>EnvironmentScoreCalculator</b> &mdash; the RHAE formula: <span class='mono'>min(1.15, (h/a)²)</span>."],
-      box:["note","The scorecard only updates on <span class='mono'>wrapper.step()</span> &rarr; trying moves on a <span class='mono'>deepcopy</span> is <b>free</b>."]},
+      box:["note","The scorecard only updates through the real wrapper (its reset()/step() path) &rarr; a <span class='mono'>deepcopy</span> of the game never goes through it, so trying moves on the copy is <b>free</b>."]},
     otherwheels:{path:"arc_agi_3_wheels/*.whl",badge:["lib","Dependencies"],title:"The dependency wheels",
       p:"The base libraries arcengine/arc_agi need.",
       li:["numpy (grid math), pydantic (data types), pillow/matplotlib (images/plots), flask/requests…","All available to install offline.","Notably: <b>no</b> deep-learning library (torch) in this set."]},
     envfiles:{path:"environment_files/",badge:["game","25 sample games"],title:"environment_files/ &mdash; the public games",
       p:"25 sample games, one subfolder each. This is a &ldquo;practice &amp; test&rdquo; set, not data to memorize.",
-      li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on <b>55 private games</b> &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
+      li:["Layout: <span class='mono'>&lt;id&gt;/&lt;version&gt;/&lt;id&gt;.py</span> + <span class='mono'>metadata.json</span>.","The contest scores on a separate, hidden set of <b>110 games</b> (half feeding the Public Leaderboard, half the Private) &mdash; intentionally different (OOD) from these 25.","&rArr; Use them only to build a general engine &mdash; never tailor to individual games."]},
     onegame:{path:"environment_files/ls20/9607627b/",badge:["game","One game"],title:"A single game folder",
       p:"Each game (ls20, cd82, re86, vc33…) is a folder with the game code + metadata.",
       li:["Sizes vary widely: from cd82 ~34 KB up to ka59 ~831 KB.","Some are keyboard-controlled, some click-controlled, some both."]},
     gamepy:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/&lt;id&gt;.py",badge:["game","Game code (obfuscated)"],title:"&lt;id&gt;.py &mdash; the game's code",
       p:"An <span class='mono'>ARCBaseGame</span> subclass: sprites, levels, camera, and the logic for handling actions + win conditions.",
-      li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most games are deterministic, no RNG &rarr; <span class='mono'>deepcopy</span> reproduces them exactly."],
+      li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most (23/25) are deterministic with no RNG. Exceptions: <span class='mono'>tr87</span> uses a per-level <b>seeded</b> RNG (reproducible); <span class='mono'>lf52</span> shuffles once with global <b>unseeded</b> <span class='mono'>np.random</span> at construction &rarr; prefer <span class='mono'>deepcopy</span> over re-instantiation."],
       box:["note","Because the game is deterministic &amp; in RAM, we turn it into a &ldquo;perfect simulator&rdquo; to find the optimal solution before playing for real."]},
     metadata:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/metadata.json",badge:["game","Game metadata"],title:"metadata.json &mdash; the accompanying info",
       p:"A short description of the game.",
-      li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the baseline move count per level (≈ the human count h); ranges from ~8 to <b>578</b>."],
+      li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the per-level baseline move count (≈ the human count h); ranges from <b>6</b> to <b>578</b> across the 25 games."],
       box:["note","baseline_actions is exactly the <span class='mono'>h</span> used to score RHAE and to set the <span class='mono'>5&times;h</span> search budget per level."]},
   };
   const treeEl=document.getElementById('fld-tree'), detailEl=document.getElementById('fld-detail');
