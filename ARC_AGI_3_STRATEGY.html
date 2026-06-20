@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ARC-AGI-3 · Master Strategy</title>
+<style>
+  :root{
+    --bg:#0a0e16; --bg2:#0e131d; --surface:#141a26; --surface2:#1a2230; --elev:#202a3a;
+    --border:#26334a; --border2:#33425e;
+    --txt:#e8eef7; --txt2:#9fb0c7; --txt3:#6f8198;
+    --teal:#2dd4bf; --violet:#8b7bf0; --amber:#f5b860; --blue:#5aa9f0;
+    --green:#46c98b; --yellow:#f5cd5b; --red:#f0726a;
+    --radius:14px; --radius-sm:9px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:radial-gradient(1200px 700px at 75% -10%,#15203a 0%,var(--bg) 55%) fixed,var(--bg);
+    color:var(--txt);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased;}
+  a{color:var(--teal);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  .mono{font-family:var(--mono)}
+
+  /* top bar */
+  header.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,14,22,.82);border-bottom:1px solid var(--border)}
+  .topin{display:flex;align-items:center;gap:18px;height:60px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:600;letter-spacing:.2px;white-space:nowrap}
+  .logo{width:30px;height:30px;border-radius:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:4px;
+    background:linear-gradient(135deg,#1a2540,#101725);border:1px solid var(--border2)}
+  .logo i{border-radius:2px;background:var(--surface2)}
+  .logo i:nth-child(1){background:var(--teal)} .logo i:nth-child(5){background:var(--violet)} .logo i:nth-child(9){background:var(--amber)}
+  nav.tabs{display:flex;gap:4px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab{appearance:none;border:0;background:transparent;color:var(--txt2);font:inherit;font-size:14px;
+    padding:8px 13px;border-radius:9px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .tab:hover{color:var(--txt);background:var(--surface)}
+  .tab.active{color:var(--bg);background:var(--teal);font-weight:600}
+
+  section.panel{display:none;animation:fade .35s ease}
+  section.panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* hero */
+  .hero{padding:54px 0 26px}
+  .eyebrow{color:var(--teal);font-weight:600;font-size:13px;letter-spacing:2px;text-transform:uppercase}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.08;margin:14px 0 8px;font-weight:700;letter-spacing:-.5px}
+  h1 .grad{background:linear-gradient(90deg,var(--teal),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--txt2);font-size:18px;max-width:760px}
+  .thesis{margin:26px 0 0;padding:18px 22px;border-left:3px solid var(--violet);background:var(--surface);
+    border-radius:0 var(--radius) var(--radius) 0;font-size:17px}
+  .thesis b{color:var(--txt)}
+  .metarow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  .chip{font-size:12.5px;color:var(--txt2);background:var(--surface);border:1px solid var(--border);
+    padding:6px 11px;border-radius:999px}
+  .chip b{color:var(--teal);font-weight:600}
+
+  h2{font-size:25px;font-weight:700;margin:0 0 4px;letter-spacing:-.3px}
+  .lead{color:var(--txt2);font-size:16px;margin:0 0 22px;max-width:780px}
+  .sectionhead{margin:8px 0 24px}
+
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .g4{grid-template-columns:repeat(auto-fit,minmax(165px,1fr))}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+  .card h3{margin:0 0 6px;font-size:16px;font-weight:600;display:flex;align-items:center;gap:9px}
+  .card p{margin:0;color:var(--txt2);font-size:14.5px}
+  .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-size:16px;flex:none;
+    background:var(--surface2);border:1px solid var(--border2)}
+
+  .fact{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden}
+  .fact .n{position:absolute;right:12px;top:2px;font-size:46px;font-weight:800;color:var(--surface2);font-family:var(--mono)}
+  .fact h3{font-size:15px;margin:0 0 4px;position:relative}
+  .fact p{font-size:13.5px;color:var(--txt2);margin:0;position:relative}
+
+  .callout{border-radius:var(--radius);padding:18px 20px;border:1px solid;display:flex;gap:14px;align-items:flex-start}
+  .callout .em{font-size:22px;line-height:1}
+  .callout.warn{background:rgba(245,205,91,.07);border-color:rgba(245,205,91,.35)}
+  .callout.danger{background:rgba(240,114,106,.07);border-color:rgba(240,114,106,.32)}
+  .callout.tip{background:rgba(45,212,191,.07);border-color:rgba(45,212,191,.32)}
+  .callout b{color:var(--txt)}
+
+  .badge{font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;font-family:var(--mono);white-space:nowrap}
+  .b-ok{background:rgba(70,201,139,.16);color:var(--green)}
+  .b-test{background:rgba(245,205,91,.16);color:var(--yellow)}
+  .b-ext{background:rgba(240,114,106,.16);color:var(--red)}
+
+  /* calculator */
+  .calc{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.calc{grid-template-columns:1fr}}
+  .ctrl{margin:0 0 18px}
+  .ctrl label{display:flex;justify-content:space-between;font-size:14px;color:var(--txt2);margin-bottom:7px}
+  .ctrl label b{color:var(--txt);font-family:var(--mono)}
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;background:var(--surface2);outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--bg)}
+  input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--bg)}
+  .readout{display:flex;align-items:baseline;gap:10px;margin:4px 0 2px}
+  .readout .big{font-size:42px;font-weight:800;font-family:var(--mono)}
+  .readout .lbl{color:var(--txt2);font-size:14px}
+  .statline{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .stat{flex:1;min-width:120px;background:var(--surface2);border-radius:var(--radius-sm);padding:11px 13px}
+  .stat .k{font-size:12px;color:var(--txt3)}
+  .stat .v{font-size:20px;font-weight:700;font-family:var(--mono);margin-top:2px}
+  .curvebox{background:var(--surface2);border-radius:var(--radius-sm);padding:14px}
+
+  /* two columns works/fails */
+  .col h3.colh{font-size:16px;display:flex;align-items:center;gap:9px;margin:0 0 12px}
+  .item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:10px}
+  .item .t{font-weight:600;font-size:14.5px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .item .d{color:var(--txt2);font-size:13.5px;margin-top:5px}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none}
+
+  /* ranking */
+  .rank{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:9px;overflow:hidden}
+  .rank .row{display:grid;grid-template-columns:30px 1fr 200px 56px;gap:12px;align-items:center;padding:13px 16px;cursor:pointer}
+  @media(max-width:680px){.rank .row{grid-template-columns:26px 1fr 56px}.rank .bar{display:none}}
+  .rank .pos{font-family:var(--mono);font-weight:700;color:var(--txt3);font-size:15px}
+  .rank .nm{font-weight:600;font-size:14.5px}
+  .rank .nm small{display:block;color:var(--txt3);font-weight:400;font-size:12.5px}
+  .bar{height:8px;border-radius:5px;background:var(--surface2);overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:5px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+  .fit{font-family:var(--mono);font-weight:700;text-align:right;font-size:15px}
+  .rank .why{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--txt2);font-size:13.5px;
+    border-top:1px solid transparent}
+  .rank.open .why{max-height:240px;border-top-color:var(--border);padding:0}
+  .rank .why p{margin:0;padding:13px 16px}
+  .rolet{font-size:11px;font-family:var(--mono);color:var(--txt3)}
+
+  /* stepper baselines */
+  .steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+  .stepbtn{flex:1;min-width:92px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);
+    padding:10px;cursor:pointer;text-align:center;transition:.15s}
+  .stepbtn:hover{border-color:var(--border2)}
+  .stepbtn.on{border-color:var(--teal);background:rgba(45,212,191,.08)}
+  .stepbtn .id{font-family:var(--mono);font-weight:700;font-size:15px}
+  .stepbtn.on .id{color:var(--teal)}
+  .stepbtn .nm{font-size:11.5px;color:var(--txt2);margin-top:2px}
+  .stepbody{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;min-height:150px}
+  .stepbody h3{margin:0 0 4px;font-size:18px}
+  .stepbody .tests{color:var(--teal);font-size:13px;font-family:var(--mono);margin-bottom:10px}
+  .stepbody p{color:var(--txt2);font-size:14.5px;margin:0 0 12px}
+  .stepbody .exp{display:inline-flex;align-items:center;gap:8px;font-size:13px;background:var(--surface2);
+    border-radius:999px;padding:6px 13px}
+  .stepbody .exp b{color:var(--txt)}
+  pre{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;overflow-x:auto;
+    font-family:var(--mono);font-size:12.5px;color:#c8d6ea;margin:12px 0 0;line-height:1.55}
+  .kw{color:var(--violet)} .fn{color:var(--teal)} .cm{color:var(--txt3)} .st{color:var(--amber)}
+
+  /* timeline */
+  .tl{position:relative;margin-left:8px;padding-left:26px}
+  .tl:before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--border2)}
+  .ph{position:relative;margin-bottom:16px}
+  .ph:before{content:"";position:absolute;left:-26px;top:5px;width:11px;height:11px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--teal)}
+  .ph.mile:before{background:var(--amber);border-color:var(--amber);width:13px;height:13px;left:-27px}
+  .ph .pt{font-weight:600;font-size:15px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  .ph .pd{color:var(--txt2);font-size:13.5px;margin-top:3px}
+  .when{font-family:var(--mono);font-size:11.5px;color:var(--txt3);background:var(--surface2);padding:2px 8px;border-radius:6px}
+  .ph.mile .when{color:var(--amber);background:rgba(245,184,96,.12)}
+
+  /* fork */
+  .fork{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+  .fk{border-radius:var(--radius);padding:16px 18px;border:1px solid}
+  .fk h4{margin:0 0 7px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .fk p{margin:0;font-size:13.5px;color:var(--txt2)}
+  .fk.green{border-color:rgba(70,201,139,.4);background:rgba(70,201,139,.06)}
+  .fk.green h4{color:var(--green)}
+  .fk.yellow{border-color:rgba(245,205,91,.4);background:rgba(245,205,91,.06)}
+  .fk.yellow h4{color:var(--yellow)}
+  .fk.red{border-color:rgba(240,114,106,.4);background:rgba(240,114,106,.06)}
+  .fk.red h4{color:var(--red)}
+
+  /* games */
+  .filterbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+  .fbtn{border:1px solid var(--border);background:var(--surface);color:var(--txt2);border-radius:999px;
+    padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+  .fbtn.on{background:var(--violet);color:#fff;border-color:var(--violet)}
+  .gtable{width:100%;border-collapse:collapse;font-size:13.5px}
+  .gtable th{text-align:left;color:var(--txt3);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px;
+    padding:8px 10px;border-bottom:1px solid var(--border)}
+  .gtable td{padding:9px 10px;border-bottom:1px solid var(--border)}
+  .gtable tr:hover td{background:var(--surface)}
+  .gid{font-family:var(--mono);font-weight:700;color:var(--teal)}
+  .gid.an{color:var(--violet)}
+  .ttag{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:5px;background:var(--surface2);color:var(--txt2)}
+
+  footer{border-top:1px solid var(--border);margin-top:50px;padding:26px 0 50px;color:var(--txt3);font-size:13px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<h2 class="sr">Interactive companion to the ARC-AGI-3 master strategy: scoring calculator, algorithm ranking, baselines, and roadmap.</h2>
+
+<header class="top"><div class="wrap topin">
+  <div class="brand"><span class="logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>ARC-AGI-3 Strategy</div>
+  <nav class="tabs" id="tabs">
+    <button class="tab active" data-t="overview">Overview</button>
+    <button class="tab" data-t="scoring">Scoring</button>
+    <button class="tab" data-t="research">Works / fails</button>
+    <button class="tab" data-t="ranking">Ranking</button>
+    <button class="tab" data-t="baselines">Baselines</button>
+    <button class="tab" data-t="roadmap">Roadmap</button>
+    <button class="tab" data-t="games">Games</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+  <!-- OVERVIEW -->
+  <section class="panel active" id="overview">
+    <div class="hero">
+      <div class="eyebrow">ARC Prize 2026 · Kaggle · offline</div>
+      <h1>Winning <span class="grad">ARC-AGI-3</span></h1>
+      <p class="sub">A general agent that, dropped into an unseen turn-based grid game with no instructions, explores, infers the goal, plans, and solves it &mdash; as efficiently as a human, offline, in one life.</p>
+      <div class="thesis">It is a <b>search-and-planning problem wearing the costume of a perception problem</b>. Because the competition ships each game as a deterministic, in-process Python object, the environment can serve as its own <b>perfect simulator</b> &mdash; turning &ldquo;the goal is never told&rdquo; into &ldquo;the goal is detectable in a free rollout.&rdquo;</div>
+      <div class="metarow">
+        <span class="chip"><b>$700K</b> grand prize (first to 100%)</span>
+        <span class="chip"><b>9h</b> / RTX 6000</span>
+        <span class="chip"><b>No internet</b> at inference</span>
+        <span class="chip"><b>25</b> public / <b>55</b> private (scored)</span>
+        <span class="chip">Milestones <b>Jun 30</b> &amp; <b>Sep 30 2026</b></span>
+      </div>
+    </div>
+
+    <div class="sectionhead"><h2>The five facts that dictate everything</h2></div>
+    <div class="grid g3" style="margin-bottom:26px">
+      <div class="fact"><span class="n">1</span><h3>Offline kills LLMs</h3><p>No internet &rarr; every OpenAI/LangGraph template in the repo is dead weight. The games run fully locally via bundled wheels.</p></div>
+      <div class="fact"><span class="n">2</span><h3>Efficiency-squared</h3><p>RHAE = min(1.15,(h/a)²) gated by a completion cap weighted to later levels. Completion dominates; efficiency can't be banked.</p></div>
+      <div class="fact"><span class="n">3</span><h3>Goal never stated</h3><p>Only Core-Knowledge priors. No language, numbers, icons. Win conditions must be discovered by interaction.</p></div>
+      <div class="fact"><span class="n">4</span><h3>Non-LLMs lead</h3><p>Humans 100%, frontier LLMs &lt;1%. The bottleneck is strategy &amp; exploration, not perception.</p></div>
+      <div class="fact"><span class="n">5</span><h3>Eval is OOD</h3><p>The 55 private games are deliberately out-of-distribution. Overfitting to the 25 public games is futile.</p></div>
+    </div>
+
+    <div class="callout danger" style="margin-bottom:14px">
+      <span class="em">&#9899;</span>
+      <div><b>The one decisive fork (Day-1, hard gate).</b> Everything depends on whether the Kaggle grader exposes the live <span class="mono">_game</span> object for <span class="mono">deepcopy</span>. It is verified on the shipped wheels but not on the real grader. <b>GREEN</b> &rarr; forward-model search is the engine and the path to 100%. <b>RED</b> &rarr; pivot to the learned-model + CNN fallback immediately. <span style="color:var(--txt3)">See the Roadmap tab.</span></div>
+    </div>
+
+    <div class="grid g2">
+      <div class="card"><h3><span class="ic">&#129518;</span>The plan in one breath</h3><p>Segment each 64&times;64 frame into objects &rarr; clone the in-process game for a free exact simulator &rarr; search it (novelty for goal discovery, an inferred win-condition heuristic for efficiency) &rarr; execute <b>only</b> the near-optimal path on the scored instance.</p></div>
+      <div class="card"><h3><span class="ic">&#127919;</span>What &ldquo;winning&rdquo; means</h3><p>Complete all levels of each private game at near-human action counts. Completion is the dominant lever; a later level is worth more than shaving actions off an early one. Build for the <b>engine</b>, never for a specific public game.</p></div>
+    </div>
+  </section>
+
+  <!-- SCORING -->
+  <section class="panel" id="scoring">
+    <div class="sectionhead"><h2>How scoring works &mdash; RHAE</h2>
+      <p class="lead">Relative Human Action Efficiency. Per level: <span class="mono">S = min(1.15, (h/a)²)</span> &mdash; human actions <span class="mono">h</span> over agent actions <span class="mono">a</span>, <b>squared</b>. Drag the sliders to feel the power-law penalty.</p></div>
+
+    <div class="card">
+      <div class="calc">
+        <div>
+          <div class="ctrl"><label>Human baseline actions (h) <b id="hv">20</b></label>
+            <input type="range" id="h" min="3" max="120" value="20" step="1"></div>
+          <div class="ctrl"><label>Your agent's actions (a) <b id="av">40</b></label>
+            <input type="range" id="a" min="3" max="600" value="40" step="1"></div>
+          <div class="ctrl"><label>Levels completed (of total) <b><span id="kv">3</span> / <span id="nv">6</span></b></label>
+            <input type="range" id="k" min="0" max="8" value="3" step="1"></div>
+          <div class="ctrl"><label>Total levels (n) <b id="nv2">6</b></label>
+            <input type="range" id="n" min="4" max="10" value="6" step="1"></div>
+
+          <div class="readout"><span class="big" id="lvlscore">100%</span><span class="lbl">per-level score</span></div>
+          <div class="statline">
+            <div class="stat"><div class="k">Efficiency a/h</div><div class="v" id="ratio">2.0&times;</div></div>
+            <div class="stat"><div class="k">Completion cap</div><div class="v" id="cap">50%</div></div>
+            <div class="stat"><div class="k">Environment score</div><div class="v" id="envscore" style="color:var(--teal)">25%</div></div>
+          </div>
+          <p style="color:var(--txt3);font-size:13px;margin:14px 0 0" id="insight"></p>
+        </div>
+        <div class="curvebox">
+          <svg id="curve" viewBox="0 0 360 280" width="100%" role="img" aria-label="Power-law efficiency curve: score falls with the square of how many more actions the agent takes than the human baseline."></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card"><h3 style="color:var(--green)">Match human (1&times;)</h3><p>Score 100% &mdash; or up to the <b>115% cap</b> if you beat the human baseline.</p></div>
+      <div class="card"><h3 style="color:var(--yellow)">2&times; human actions</h3><p>Only <b>25%</b> credit. The square punishes wandering hard.</p></div>
+      <div class="card"><h3 style="color:var(--red)">10&times; / over budget</h3><p><b>1%</b> credit. The agent is also terminated after <b>5&times;h</b> actions per level.</p></div>
+    </div>
+    <div class="callout tip" style="margin-top:16px"><span class="em">&#128161;</span>
+      <div><b>Strategic consequence.</b> The environment score is <span class="mono">min(completion&nbsp;cap, weighted&nbsp;average)</span>, with level weights <span class="mono">w&#8343; = l</span> (later levels dominate). You <b>cannot bank</b> efficiency on easy levels to offset failing hard ones &mdash; finishing more (and later) levels is the dominant lever.</div></div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="panel" id="research">
+    <div class="sectionhead"><h2>What works &amp; what does not</h2>
+      <p class="lead">Approaches that exploit the deterministic in-process simulator win. Approaches that try to learn or reason their way to the goal from scratch lose.</p></div>
+    <div class="grid g2">
+      <div class="col">
+        <h3 class="colh"><span style="color:var(--green)">&#9650;</span> What works</h3>
+        <div id="works"></div>
+      </div>
+      <div class="col">
+        <h3 class="colh"><span style="color:var(--red)">&#9660;</span> What does not (and why)</h3>
+        <div id="fails"></div>
+      </div>
+    </div>
+    <div class="callout warn" style="margin-top:18px"><span class="em">&#9888;</span>
+      <div><b>The dominant trap:</b> handcrafting or training on the 25 public games. The TR87 environment goes <b>0% &rarr; 97.1%</b> with a hand-built harness &mdash; yet its sibling BP35 stays <b>0%</b>. Solution-level handcrafting fails; only <b>engine-level</b> generality transfers to the OOD private set.</div></div>
+  </section>
+
+  <!-- RANKING -->
+  <section class="panel" id="ranking">
+    <div class="sectionhead"><h2>Algorithm ranking</h2>
+      <p class="lead">Fit (0&ndash;100) for this exact problem: zero-shot, single-life, efficiency-scored, offline, unseen mechanics. Click a row for the justification. Bars animate on open.</p></div>
+    <div id="ranks"></div>
+    <p style="color:var(--txt3);font-size:13px;margin-top:14px">Pure online-API LLM/VLM agents are excluded entirely &mdash; inert offline. A local open-weights model is at most a perception/prior, never the decision-maker.</p>
+  </section>
+
+  <!-- BASELINES -->
+  <section class="panel" id="baselines">
+    <div class="sectionhead"><h2>Baselines &mdash; the build order</h2>
+      <p class="lead">Each baseline is useful alone and becomes a reusable component of the winning stack. Click through them.</p></div>
+    <div class="steps" id="steps"></div>
+    <div class="stepbody" id="stepbody"></div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="panel" id="roadmap">
+    <div class="sectionhead"><h2>Execution roadmap</h2>
+      <p class="lead">Fork-structured. Phase 1 is a Day-1 go/no-go gate; everything downstream assumes its outcome.</p></div>
+
+    <h3 style="font-size:16px;margin:0 0 12px">The Day-1 fork</h3>
+    <div class="fork">
+      <div class="fk green"><h4>&#9679; GREEN (expected)</h4><p><span class="mono">_game</span> reachable, deepcopy free &amp; deterministic. Forward-model search is the primary engine. The ~100% path.</p></div>
+      <div class="fk yellow"><h4>&#9679; YELLOW</h4><p>Reachable but stochastic on some envs. Deepcopy-only + mandatory RNG state guard; flag those envs for the learned fallback.</p></div>
+      <div class="fk red"><h4>&#9679; RED</h4><p>Only a frozen / remote <span class="mono">step()</span>. Pivot to a learned-deterministic world model + CNN proposer. Re-scope immediately.</p></div>
+    </div>
+
+    <h3 style="font-size:16px;margin:26px 0 14px">Phases &amp; milestones</h3>
+    <div class="tl" id="tl"></div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="panel" id="games">
+    <div class="sectionhead"><h2>The 25 public environments</h2>
+      <p class="lead">Our dev &amp; held-out validation set &mdash; never a training target. 8 were reverse-engineered (purple id). Filter by control type.</p></div>
+    <div class="filterbar" id="filters">
+      <button class="fbtn on" data-f="all">All <span id="cAll"></span></button>
+      <button class="fbtn" data-f="keyboard">Keyboard</button>
+      <button class="fbtn" data-f="click">Click</button>
+      <button class="fbtn" data-f="keyboard_click">Keyboard + click</button>
+      <button class="fbtn" data-f="analyzed">Reverse-engineered</button>
+    </div>
+    <table class="gtable">
+      <thead><tr><th>ID</th><th>fps</th><th>Control</th><th>~Levels</th><th>Notes</th></tr></thead>
+      <tbody id="gbody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  Interactive companion to <span class="mono">ARC_AGI_3_MASTER_STRATEGY.md</span> · SJSU CMPE 295A Group 2 ·
+  Evidence: <span class="badge b-ok">verified</span> <span class="badge b-test">confirm Day-1</span> <span class="badge b-ext">external</span>
+  · Sources: <a href="https://arcprize.org/competitions/2026/arc-agi-3">ARC Prize 2026</a> ·
+  <a href="https://arcprize.org/media/ARC_AGI_3_Technical_Report.pdf">Technical Report</a>
+</footer>
+
+<script>
+/* ---------- tabs ---------- */
+const tabs=document.getElementById('tabs');
+tabs.addEventListener('click',e=>{
+  const b=e.target.closest('.tab'); if(!b)return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t===b));
+  const id=b.dataset.t;
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='ranking')drawRanks();
+});
+
+/* ---------- RHAE calculator ---------- */
+const $=id=>document.getElementById(id);
+function r(x,d=0){const m=10**d;return Math.round(x*m)/m;}
+function calc(){
+  const h=+$('h').value, a=+$('a').value, n=+$('n').value;
+  let k=Math.min(+$('k').value,n);
+  $('k').max=n;
+  $('hv').textContent=h; $('av').textContent=a; $('nv').textContent=n; $('nv2').textContent=n; $('kv').textContent=k;
+  const S=Math.min(1.15,(h/a)**2);
+  const cap = n>0 ? (k*(k+1))/(n*(n+1)) : 0;          /* weighted fraction completed */
+  const env = Math.min(cap, S*cap);                   /* uniform-S illustration */
+  $('lvlscore').textContent=r(S*100)+'%';
+  $('lvlscore').style.color = S>=0.85?'var(--green)':S>=0.4?'var(--yellow)':'var(--red)';
+  $('ratio').textContent=r(a/h,2)+'×';
+  $('cap').textContent=r(cap*100)+'%';
+  $('envscore').textContent=r(env*100)+'%';
+  let msg;
+  if(a<h) msg='Faster than human — you hit the 115% efficiency cap on this level.';
+  else if(a/h<=1.2) msg='Near-human efficiency: close to full credit.';
+  else if(a/h<=2.5) msg='The square is biting: '+r(a/h,1)+'× the actions costs most of your credit.';
+  else msg='Far over baseline — power-law collapse. Beyond 5× the level is force-terminated.';
+  $('insight').textContent=msg + (k<n? ' Completion cap holds the environment at '+r(cap*100)+'% until you finish all '+n+' levels.':' All levels done — cap is 100%.');
+  drawCurve(h,a);
+}
+function drawCurve(h,a){
+  const W=360,H=280,pl=42,pr=14,pt=16,pb=34, x0=pl,x1=W-pr,y0=H-pb,y1=pt;
+  const rmax=5; /* a/h from ~0.8 to 5 */
+  const X=ratio=>x0+((ratio-0.8)/(rmax-0.8))*(x1-x0);
+  const Y=s=>y0-(s/1.15)*(y0-y1);
+  let pts='';
+  for(let i=0;i<=120;i++){const ratio=0.8+(rmax-0.8)*i/120; const s=Math.min(1.15,(1/ratio)**2); pts+=(i?' L':'M')+r(X(ratio),1)+' '+r(Y(s),1);}
+  const cur=Math.max(0.8,Math.min(rmax,a/h)); const cs=Math.min(1.15,(1/cur)**2);
+  const grid=[0,0.25,0.5,0.75,1,1.15].map(s=>`<line x1="${x0}" y1="${r(Y(s),1)}" x2="${x1}" y2="${r(Y(s),1)}" stroke="#26334a" stroke-width="1"/><text x="${x0-6}" y="${r(Y(s)+3,1)}" fill="#6f8198" font-size="10" text-anchor="end" font-family="ui-monospace,monospace">${r(s*100)}%</text>`).join('');
+  const xt=[1,2,3,4,5].map(t=>`<text x="${r(X(t),1)}" y="${y0+16}" fill="#6f8198" font-size="10" text-anchor="middle" font-family="ui-monospace,monospace">${t}×</text>`).join('');
+  $('curve').innerHTML=`
+    ${grid}${xt}
+    <line x1="${x0}" y1="${y1}" x2="${x0}" y2="${y0}" stroke="#33425e" stroke-width="1"/>
+    <text x="${(x0+x1)/2}" y="${H-4}" fill="#9fb0c7" font-size="11" text-anchor="middle">agent actions ÷ human baseline</text>
+    <path d="${pts}" fill="none" stroke="#2dd4bf" stroke-width="2.5"/>
+    <line x1="${r(X(cur),1)}" y1="${y1}" x2="${r(X(cur),1)}" y2="${y0}" stroke="#8b7bf0" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <circle cx="${r(X(cur),1)}" cy="${r(Y(cs),1)}" r="5.5" fill="#8b7bf0" stroke="#0a0e16" stroke-width="2"/>
+    <text x="${r(X(cur)+ (cur>3.5?-8:8),1)}" y="${r(Y(cs)-9,1)}" fill="#c9c2f7" font-size="11" text-anchor="${cur>3.5?'end':'start'}" font-family="ui-monospace,monospace">${r(cs*100)}%</text>`;
+}
+['h','a','k','n'].forEach(id=>$(id).addEventListener('input',calc));
+
+/* ---------- works / fails ---------- */
+const works=[
+  ['Forward-model planning (env as perfect simulator)','var(--teal)','THE primary engine. Deepcopy the game, search for free, execute only the near-optimal path. Converts the unknown goal into a detectable one.'],
+  ['Object-centric perception + state-graph','var(--violet)','Segment the grid into objects; prune dead-ends with a canonical frame hash. The Blind Squirrel pattern (6.71% preview).'],
+  ['Small local CNN (action-effect + click head)','var(--blue)','Scores the 4096-wide click branch with 2D bias; guides search. The StochasticGoose design led the preview at 12.58%.'],
+  ['Go-Explore / novelty exploration','var(--amber)','Return-to-state is free via deepcopy; language-free novelty drives goal discovery. A substrate, never standalone.'],
+];
+const fails=[
+  ['Pure LLM / VLM agents','var(--red)','Mechanically impossible offline; frontier models &lt;1%. The bottleneck is strategy, not perception (TR87 0%&rarr;97.1% with a harness).'],
+  ['Learned world models (Dreamer / MuZero)','var(--red)','Right family, wrong problem: you already own the exact model for free. Sample-hungry; can’t pretrain on OOD eval. Fallback only.'],
+  ['Model-free deep RL (PPO / DQN / Rainbow)','var(--red)','Needs 10⁵–10⁸ steps vs a ~10²–10³ single-life budget; the squared metric punishes its core exploration. Worst-matched.'],
+  ['Meta-RL / in-context RL','var(--red)','Amortizes over a known distribution; the eval is intentionally OOD and pretraining on it is forbidden. Disqualifying mismatch.'],
+  ['DSL synthesis of dynamics','var(--amber)','Redundant against the exact simulator; overfits public mechanics. Keep only win-predicate induction as a module.'],
+];
+function renderItems(list,el){el.innerHTML=list.map(x=>`<div class="item"><div class="t"><span style="display:flex;gap:9px;align-items:center"><span class="dot" style="background:${x[1]}"></span>${x[0]}</span></div><div class="d">${x[2]}</div></div>`).join('');}
+renderItems(works,$('works')); renderItems(fails,$('fails'));
+
+/* ---------- ranking ---------- */
+const ranks=[
+  ['1','Forward-model tree/graph search','deepcopy-as-perfect-simulator: BFS / IDA* / best-first / MCTS',82,'Primary engine','var(--teal)','Converts &ldquo;goal never told&rdquo; into a checkable objective via free exact rollouts, and drives executed action counts to ≤ human baseline. Capped at 82 only by the Day-1 harness-access risk and search-horizon explosion on deep levels.'],
+  ['2','Small local CNN perception','action-effect + 64×64 coordinate head, segmenter',42,'Perception aide + fallback','var(--violet)','The only paradigm with a real ARC-AGI-3 lead (12.58% preview). Tames the 4096-wide click branch and is the GPU-resident fallback decision-maker if the simulator is sealed.'],
+  ['3','Go-Explore + novelty exploration','cell archive, return-to-state, RND, frame-change',38,'Exploration substrate','var(--blue)','Return-to-state is free/exact via deepcopy; language-free novelty drives goal discovery on OOD mechanics. But it covers states, it does not reason — feed it into search, never run it alone.'],
+  ['4','Neuro-symbolic object-centric + state graph','CC segmentation, canonical hash, dead-end prune',38,'State-abstraction front-end','var(--blue)','The right shared abstraction (arcengine is object-centric). Its symbolic planner is redundant when deepcopy works and unreliable when it does not.'],
+  ['5','Program / DSL synthesis','win-predicate induction, affordance abstraction',34,'Goal-induction module','var(--amber)','Inducing the win condition gives search a dense subgoal. Inducing the dynamics is dominated by the exact simulator and overfits the public set.'],
+  ['6','Learned world models','DreamerV3 / MuZero / IRIS, test-time',18,'Contingency fallback','var(--amber)','Conceptually canonical but strictly worse than possessing the exact model for free. Reserve for the sealed-simulator + replay-blocked case only.'],
+  ['7','Meta-RL / in-context RL','RL², AMAGO, RELIC, Algorithm Distillation',18,'Not recommended','var(--amber)','Perfect lexical match, disqualifying distribution mismatch: the eval is intentionally OOD with no adequate training distribution.'],
+  ['8','Model-free deep RL','PPO, DQN/Rainbow, IMPALA, R2D2',8,'Not recommended','var(--red)','Total mismatch: extreme sample-hunger against a single-life budget, and the squared-efficiency metric punishes the exploratory wandering it depends on.'],
+];
+function colorFor(f){return f>=70?'var(--teal)':f>=35?'var(--violet)':f>=20?'var(--amber)':'var(--red)';}
+$('ranks').innerHTML=ranks.map((x,i)=>`
+  <div class="rank" data-i="${i}">
+    <div class="row">
+      <div class="pos">#${x[0]}</div>
+      <div class="nm">${x[1]}<small>${x[2]}</small></div>
+      <div class="bar"><i data-fit="${x[3]}" style="background:${colorFor(x[3])}"></i></div>
+      <div class="fit" style="color:${colorFor(x[3])}">${x[3]}</div>
+    </div>
+    <div class="why"><p><span class="rolet">ROLE: ${x[4]}</span><br>${x[6]}</p></div>
+  </div>`).join('');
+document.querySelectorAll('.rank .row').forEach(row=>row.addEventListener('click',()=>row.parentElement.classList.toggle('open')));
+let ranksDrawn=false;
+function drawRanks(){ /* animate bars */ requestAnimationFrame(()=>{document.querySelectorAll('.bar i').forEach(b=>b.style.width=b.dataset.fit+'%');});}
+
+/* ---------- baselines stepper ---------- */
+const steps=[
+  ['B-1','Simulability probe','Day-1 blocker','Does the harness hand you the live <span class="mono">_game</span> (OFFLINE) or a frozen / remote <span class="mono">step()</span> (COMPETITION &rarr; HTTP, dead offline)? A 30-line probe decides the whole strategy.','Gate','<span class="cm"># run on all 25 public envs</span>\n<span class="kw">g2</span> = copy.<span class="fn">deepcopy</span>(env._game)\ng2.<span class="fn">perform_action</span>(a)\n<span class="kw">assert</span> env._game frame unchanged\n<span class="kw">assert</span> scorecard delta == <span class="st">0</span>  <span class="cm"># sim is free</span>'],
+  ['B0','Random sanity','Plumbing + calibration floor','Load each env in OFFLINE mode, drive the loop, read FrameData, compute local RHAE. Random solves a non-tutorial level &lt;1/10,000 — confirms the pipeline isn’t silently broken.','≈0% · floor','<span class="kw">loop</span>:\n    a = <span class="fn">sample_uniform</span>(frame.available_actions)\n    frame = env.<span class="fn">step</span>(a)\n<span class="cm"># critical fix: raise MAX_ACTIONS=80 → 5·h</span>'],
+  ['B1','Novelty explorer','Perception + click-pruning substrate','Greedy on frame-change + novelty + did <span class="mono">levels_completed</span> tick. Segment objects, click one centroid each (never raw 4096). The preview leaders’ approach — and the mandatory fallback.','low–mid % · stalls deep','<span class="kw">for</span> cand <span class="kw">in</span> <span class="fn">enumerate_candidate_actions</span>(frame):\n    score: frame changed? + novelty? + level tick?\n<span class="kw">if</span> no-op: blacklist <span class="cm"># wall / invalid click</span>'],
+  ['B2','Deepcopy BFS / IDDFS','The core thesis — the big score jump','Search the free perfect simulator; WIN is detectable (<span class="mono">levels_completed</span> in rollouts). Execute only the found path → near-cap RHAE on narrow-branch levels. Stalls on depth-190+ sparse-reward levels.','near-cap · mid levels','<span class="kw">def</span> <span class="fn">plan</span>(real):\n    root = copy.<span class="fn">deepcopy</span>(real)        <span class="cm"># free, unscored</span>\n    <span class="cm"># IDDFS + canonical_hash for cycles</span>\n    <span class="kw">if</span> c.levels_completed &gt; target: <span class="kw">return</span> path+[a]\n<span class="fn">execute_only</span>(plan(real))            <span class="cm"># only scored steps</span>'],
+  ['B3','Best-first + win inference','The 100% path','Object-centric graph + the free simulator + a heuristic = goal-directed search. Infer which of {pixel-match, pose-match, reach-match} the env is; decompose deep levels into ≤30-depth subgoals. Mirrors ARC’s own §3.5.2.','→ 100% on simulable','f = g_cost + <span class="fn">heuristic</span>(c)   <span class="cm"># inferred-goal distance</span>\n<span class="cm"># pixel-match | pose-match | reach-match</span>\n<span class="cm"># subgoal decomposition tames depth-400 search</span>'],
+];
+$('steps').innerHTML=steps.map((s,i)=>`<button class="stepbtn${i===0?' on':''}" data-i="${i}"><div class="id">${s[0]}</div><div class="nm">${s[1]}</div></button>`).join('');
+function showStep(i){
+  document.querySelectorAll('.stepbtn').forEach(b=>b.classList.toggle('on',+b.dataset.i===i));
+  const s=steps[i];
+  $('stepbody').innerHTML=`<h3>${s[0]} · ${s[1]}</h3><div class="tests">${s[2]}</div><p>${s[3]}</p><span class="exp">Expected RHAE: <b>${s[4]}</b></span><pre>${s[5]}</pre>`;
+}
+$('steps').addEventListener('click',e=>{const b=e.target.closest('.stepbtn'); if(b)showStep(+b.dataset.i);});
+showStep(0);
+
+/* ---------- roadmap ---------- */
+const phases=[
+  ['Phase 0','Days 0–5','Offline harness + RHAE scoring/replay rig over the 25 public games; freeze an 18/7 mechanic-family holdout split.',false],
+  ['Phase 1 — Day-1 gate','Day 1','Probe the perfect simulator on all 25 envs. Lock GREEN / YELLOW / RED. Nothing downstream proceeds until this resolves.',false],
+  ['Phase 2','Weeks 2–4','Explorer: object-centric perception + directed state-graph; discover the win by interaction (the actual hard problem).',false],
+  ['Milestone #1','Jun 30 2026','Bank it: a working general search agent completing a solid majority of dev-game levels; notebook runs offline under budget.',true],
+  ['Phase 3–4','Weeks 4–9','Planner (best-first / A* / MCTS + inferred heuristics + subgoals) and the CNN / world-model fallback hardening.',false],
+  ['Phase 5–6','Weeks 9–12','Generalization hardening (holdout-only gate, constant-hunt audit) + 9h / RTX 6000 compute-budget governor.',false],
+  ['Milestone #2','Sep 30 2026','Full stack generalizing across mechanic families, finishing the private set in budget — push the 100% Grand-Prize bar.',true],
+  ['Phase 7','Wks 12–13+','Offline notebook packaging, determinism, CC0/MIT-0 license, end-to-end rehearsal; re-verify against new wheel releases.',false],
+];
+$('tl').innerHTML=phases.map(p=>`<div class="ph${p[3]?' mile':''}"><div class="pt">${p[0]} <span class="when">${p[1]}</span></div><div class="pd">${p[2]}</div></div>`).join('');
+
+/* ---------- games ---------- */
+const games=[
+  ['ar25',6,'keyboard_click',8,''],['bp35',20,'keyboard_click',9,'Gravity platformer; reach the gem. Opus 0% w/ &amp; w/o harness (hard).',1],
+  ['cd82',30,'keyboard_click',6,'Smallest. Directional paint → canvas matches target.',1],['cn04',5,'keyboard_click',6,''],
+  ['dc22',15,'keyboard_click',6,''],['ft09',8,'keyboard',6,''],['g50t',30,'keyboard',7,''],
+  ['ka59',10,'keyboard_click',7,'Largest file (831 KB).'],['lf52',30,'click',10,'Sliding-block match. Unseeded global RNG → deepcopy-only.',1],
+  ['lp85',20,'click',8,''],['ls20',30,'keyboard',7,'Canonical demo. Object-attribute matching; L1 P(win)=1/355; L7 fog.',1],
+  ['m0r0',7,'keyboard_click',6,''],['r11l',30,'click',6,''],['re86',25,'keyboard_click',8,'Polyomino assembly → pixel-match. Report RHAE example; L7 depth ~424.',1],
+  ['s5i5',15,'click',8,''],['sb26',30,'keyboard_click',8,''],['sc25',20,'keyboard_click',6,''],
+  ['sk48',30,'keyboard_click',8,''],['sp80',10,'keyboard_click',6,''],['su15',20,'click',9,''],
+  ['tn36',3,'click',7,'Object transform (rigid+scale+recolor) → match ghost. Clicks = buttons + cells.',1],
+  ['tr87',10,'keyboard',6,'Tape/grammar rewrite. Opus 0%→97.1% with handcrafted harness.',1],
+  ['tu93',30,'keyboard_click',9,''],['vc33',20,'click',7,'Per-level gravity vector physics. L6 ~50 actions vs L1 &lt;5.',1],
+  ['wa30',5,'keyboard',9,''],
+];
+$('cAll').textContent=games.length;
+function tagLabel(t){return t==='keyboard_click'?'kbd + click':t;}
+function renderGames(f){
+  const rows=games.filter(g=> f==='all'?true : f==='analyzed'?g[5] : g[2]===f);
+  $('gbody').innerHTML=rows.map(g=>`<tr><td><span class="gid${g[5]?' an':''}">${g[0]}</span></td><td class="mono" style="color:var(--txt2)">${g[1]}</td><td><span class="ttag">${tagLabel(g[2])}</span></td><td class="mono" style="color:var(--txt2)">${g[3]}</td><td style="color:var(--txt2)">${g[4]||'<span style="color:var(--txt3)">—</span>'}</td></tr>`).join('');
+}
+$('filters').addEventListener('click',e=>{const b=e.target.closest('.fbtn'); if(!b)return;
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.toggle('on',x===b)); renderGames(b.dataset.f);});
+renderGames('all');
+
+calc();
+</script>
+</body>
+</html>
