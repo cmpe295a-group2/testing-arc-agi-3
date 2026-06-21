@@ -45,10 +45,10 @@
 | **Offline rule handled?** | Explicit: deletes LLM templates, OFFLINE mode | LLM as router only | LLM as hypothesis gen only | "Small‑model + offline" (NVARC template), but proven wins are API‑dependent |
 | **RHAE / efficiency** | Exact formula; completion‑dominance is the spine | Trace compression noted | Action‑cost‑aware + trace compression | Cites RHAE % / action counts; no engagement with the squared term |
 | **OOD / anti‑overfit** | Held‑out split + constant‑hunt audit | Warns synthetic≠private | Self‑play tooling + meta‑prior | Aware (cites StochasticGoose collapse) but synthetic‑meta‑training bet is OOD‑risky |
-| **Evidence grounding** | Source‑verified wheels + ✅/🧪/⚠️ tags | Preview results cited | arXiv IDs look fabricated | **Best landscape grounding**: real leaderboard + ARC‑AGI‑2 lineage |
+| **Evidence grounding** | Source‑verified wheels + ✅/🧪/⚠️ tags | Preview results cited | arXiv IDs **verified real** (2026‑06) | **Best landscape grounding**: real leaderboard + ARC‑AGI‑2 lineage |
 | **Risk analysis** | 9‑row register + Day‑1 go/no‑go gate | Light | Per‑algo notes | None (scoping plan) |
 | **Biggest strength** | Decisive insight + rigor + falsifiable gate | Realistic, well‑prioritized | Breadth and tactical depth | Research depth + best RED‑path blueprint |
-| **Biggest weakness** | Load‑bearing on one runtime‑unverified assumption (mitigated) | Misses the free‑simulator exploit | Over‑engineered; offline‑hostile loops; shaky citations | Earliest‑stage; misses the exploit; light on the exact metric |
+| **Biggest weakness** | Load‑bearing on one runtime‑unverified assumption (mitigated) | Misses the free‑simulator exploit | Over‑engineered; offline‑hostile loops | Earliest‑stage; misses the exploit; light on the exact metric |
 
 ---
 
@@ -74,7 +74,7 @@ Scored on the eight criteria (0–10; **Engine exploitation** and **Scoring‑aw
 
 **🥈 2. `plan_1.md` — 63/100.** The best self‑contained external list: right instincts (state graph + exploration on top, LLM as router only), preview‑aligned, clean phased build. Blind spot: the free simulator. Fold the Master Plan's deepcopy spine into it and it becomes very strong.
 
-**🥉 3. `plan_2.md` — 65/100 (ranked 3rd on alignment).** The most thorough and the best *parts bin* — mine it for probing, causal testing, delta compiler, MPC repair, constraint solving. Demoted below `plan_1` because its headline (build+verify an executable world model with a coding agent) is offline‑fragile, dominated by the free simulator, and its citations are untrustworthy.
+**🥉 3. `plan_2.md` — 65/100 (ranked 3rd on alignment).** The most thorough and the best *parts bin* — mine it for probing, causal testing, delta compiler, MPC repair, constraint solving. Demoted below `plan_1` because its headline (build+verify an executable world model with a coding agent) is offline‑fragile and dominated by the free simulator. **Correction (2026‑06):** a web check confirms its arXiv citations (2605.05138, 2605.09650, 2603.24621) are all **real** — its evidence grounding was underrated here.
 
 **4. `research.md` — 60/100.** The best‑researched document, but an earlier‑stage scoping note that misses the exploit and barely engages the exact scoring metric — hence 4th as a *self‑contained strategy*. **Yet it is the #1 document to merge:** its executable‑world‑model + falsification program is the best available blueprint for the RED branch where the Master Plan is thin. See §4.
 
@@ -109,7 +109,7 @@ The one place `research` nearly ties is **evidence grounding**: the Master Plan 
 ### Two datapoints `research` contributes — and what they prove
 
 - **🔴 StochasticGoose: 12.58% → 0.25%.** The preview's #1 learned‑exploration CNN collapsed to roughly frontier‑LLM level at full launch. *Proves:* learned exploration **overfits and does not generalize** to the private OOD set — a direct vindication of the Master Plan's "search the actual rules, nothing to overfit," and a warning against `research`'s own synthetic‑meta‑training bet.
-- **🟢 SingularityNET executable world model: 15/25 solved, 58.12% mean RHAE.** The strongest publicly reported ARC‑AGI‑3 result — a world‑model refinement loop, no deepcopy exploit. *Proves:* the "honest path" can go far, so `research`'s direction is credible — **but** it ran on a hosted frontier API (not Kaggle‑eligible) and is public‑only. Where deepcopy works, the Master Plan still dominates it; where it doesn't, this is the bar to beat offline.
+- **🟢 SingularityNET executable world model: 58.12% mean RHAE, 15/25 solved** (v2, GPT‑5.5; the v1 baseline was **32.58%, 7/25** with GPT‑5.4 — don't treat 58% as the baseline). The strongest publicly reported ARC‑AGI‑3 result — a verifier‑driven Python world model, no deepcopy exploit. *Proves:* the "honest path" can go far, so `research`'s direction is credible — **but** it ran on a hosted frontier API (not Kaggle‑eligible) and is public‑only. Where deepcopy works, the Master Plan still dominates it; where it doesn't, this is the bar to beat offline.
 
 ### What to mine from `research`
 

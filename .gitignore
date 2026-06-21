@@ -1,0 +1,6 @@
+# dev artifacts
+.venv-arc/
+__pycache__/
+*.pyc
+arc-prize-2026-arc-agi-3/_wheelsrc/
+_wheel_tmp/

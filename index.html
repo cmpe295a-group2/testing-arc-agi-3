@@ -381,6 +381,18 @@
     .fld .explorer{grid-template-columns:1fr}
     .fld .farrow{transform:rotate(90deg);justify-content:center;width:100%;padding:4px 0}
   }
+  .solverhero{padding:26px;border:1px solid rgba(45,212,191,.34);border-radius:18px;background:linear-gradient(135deg,rgba(45,212,191,.12),rgba(96,165,250,.07) 58%,transparent)}
+  .solverhero h2{margin:7px 0 10px;font-size:clamp(30px,5vw,54px);line-height:1.03}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+  .kpi{padding:16px;border:1px solid var(--border2);border-radius:14px;background:var(--surface)}
+  .kpi strong{display:block;font-size:clamp(25px,3vw,38px);line-height:1;color:var(--teal);margin-bottom:7px}
+  .kpi span{color:var(--txt2);font-size:13px}
+  .pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .pipe{position:relative;padding:15px;border:1px solid var(--border2);border-radius:12px;background:var(--surface)}
+  .pipe b{display:block;margin-bottom:5px}.pipe p{margin:0;color:var(--txt2);font-size:13px}
+  .runbox{padding:14px 16px;border-radius:12px;background:#080d18;border:1px solid var(--border2);overflow:auto;color:#b9f6e9;font:13px/1.6 var(--mono)}
+  @media(max-width:900px){.kpis,.pipeline{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.kpis,.pipeline{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -393,6 +405,7 @@
     </div>
     <nav class="tabs" id="tabs">
       <button class="tab active" data-p="overview">Overview</button>
+      <button class="tab" data-p="solver">Honest Agent</button>
       <button class="tab" data-p="rules">Game Rules</button>
       <button class="tab" data-p="scoring">Scoring (RHAE)</button>
       <button class="tab" data-p="games">The 25 Games</button>
@@ -417,10 +430,17 @@
       the scoring, and the team's master strategy for winning it.</p>
 
     <div class="thesis">
-      <b>The thesis in one sentence:</b> ARC&#8209;AGI&#8209;3 is a <b>search-and-planning</b> problem wearing the
-      costume of a <b>perception</b> problem — and because the games ship as deterministic, in-process Python
-      objects, the environment can serve as its own perfect simulator, turning <i>"the goal is never told"</i>
-      into <i>"the goal is detectable in a free rollout."</i>
+      <b>The corrected conclusion:</b> the former 25/25 result replayed public answers and is rejected for private/OOD
+      evaluation. The replacement is an <b>anonymous online learner</b>: infer objects and action effects from frames,
+      build a state graph, learn goal hypotheses from genuine wins, and plan without game ID, source, or traces.
+    </div>
+
+    <div class="callout tip" style="margin-top:18px;text-align:left">
+      <div class="em">&#10003;</div>
+      <div><b>Verified honest baseline &middot; 2026-06-20:</b> leakage audit passed; the anonymous black-box agent completed
+      <b>2/183 public levels</b>, won <b>0/25 games</b>, and measured <b>0.25% mean RHAE</b> under an 8-second/game cap.
+      Low, but real: no answer lookup contributed a single action.
+      <a href="#" data-goto="solver">Open the boundary, code, and result &#8594;</a></div>
     </div>
 
     <div class="metarow">
@@ -450,9 +470,9 @@
     <div class="fact"><div class="n">3</div><h3>The goal is never stated</h3>
       <p>No language, numbers, or icons — only Core-Knowledge priors (objectness, geometry, physics, agentness).
       Win conditions must be <b>discovered by interaction</b>.</p></div>
-    <div class="fact"><div class="n">4</div><h3>LLMs lose; search wins</h3>
-      <p>Frontier LLMs score &lt;1%; humans solve 100%. The bottleneck is <b>strategy / exploration</b>, not
-      perception. Non-LLM agents lead the benchmark.</p></div>
+    <div class="fact"><div class="n">4</div><h3>Blind search also loses</h3>
+      <p>Raw BFS over cloned states reached only about <b>16/183 levels</b>: branching and horizons explode.
+      Search becomes useful after symbolic abstraction, solver selection, and macro construction.</p></div>
     <div class="fact"><div class="n">5</div><h3>The eval is intentionally OOD</h3>
       <p>25 public / 55 semi-private / <b>55 fully-private</b> (the scored set). Overfitting to the public games
       is futile — only <b>engine-level generality</b> transfers.</p></div>
@@ -480,6 +500,86 @@
     <div class="card"><h3><span class="ic">&#129518;</span>2 · Model</h3><p>Build a model of the dynamics — how objects move, collide, and transform.</p></div>
     <div class="card"><h3><span class="ic">&#127919;</span>3 · Infer the goal</h3><p>Discover the unstated win condition from behavior alone (what flips to the next level).</p></div>
     <div class="card"><h3><span class="ic">&#9889;</span>4 · Plan &amp; execute</h3><p>Find and run a near-optimal action sequence — once — on the scored instance.</p></div>
+  </div>
+</section>
+
+<!-- ===================== HONEST GENERAL AGENT ===================== -->
+<section class="panel" id="solver">
+  <div class="solverhero">
+    <div class="eyebrow">Leakage-audited implementation &middot; 2026-06-20</div>
+    <h2><span class="grad">2/183 levels</span>&mdash;and this time it is real.</h2>
+    <p class="lead">The earlier 25/25 implementation selected stored public answers by game ID. It has been removed.
+      The replacement is constructed with no environment identity and learns again from frames and actions inside
+      every game. Its current score is low, but it is evidence about the algorithm that can transfer to private games.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><strong>2/183</strong><span>public levels completed</span></div>
+    <div class="kpi"><strong>0/25</strong><span>games ending in WIN</span></div>
+    <div class="kpi"><strong>0.25%</strong><span>mean game RHAE</span></div>
+    <div class="kpi"><strong>PASS</strong><span>answer-leakage audit</span></div>
+  </div>
+
+  <div class="callout danger">
+    <div class="em">&#10005;</div>
+    <div><b>Correction:</b> the deleted solver's 183/183 result was execution coverage, not intelligence:
+      23 published traces plus two fixed public policies. Those artifacts are no longer present, and the audit fails
+      if public IDs, trace files, source readers, or environment-specific policies enter the policy boundary.</div>
+  </div>
+
+  <h3 class="blk">The inference boundary</h3>
+  <div class="grid g2">
+    <div class="card"><h3><span class="ic">&#10003;</span>Policy may see</h3>
+      <p>Latest grid, public available-action IDs, terminal state, levels completed, and optionally a narrow
+      <code>fork / step / observe</code> black-box simulator.</p></div>
+    <div class="card"><h3><span class="ic">&#9940;</span>Policy may not see</h3>
+      <p>Game ID, Python source, metadata, solution traces, hidden engine fields, internal valid-click oracles,
+      coordinates keyed to a known environment, or a per-game policy registry.</p></div>
+  </div>
+
+  <h3 class="blk">What the new code actually learns</h3>
+  <div class="pipeline">
+    <div class="pipe"><b>1 &middot; Perceive objects</b><p>Connected components, palette counts, bounding boxes, and object-centred click proposals.</p></div>
+    <div class="pipe"><b>2 &middot; Learn effects</b><p>Measure frame change, information gain, lethal transitions, and useful action classes online.</p></div>
+    <div class="pipe"><b>3 &middot; Infer goals</b><p>Mine clear/collect or reach/landmark hypotheses only after a level is genuinely completed.</p></div>
+    <div class="pipe"><b>4 &middot; Plan &amp; verify</b><p>Short BFS, novelty/goal-guided search, real-transition verification, and online UCB fallback.</p></div>
+  </div>
+
+  <h3 class="blk">Measured runs</h3>
+  <div class="scrollx">
+  <table class="tbl">
+    <tr><th>Mode</th><th>Scope</th><th>Budget</th><th>Result</th><th>Interpretation</th></tr>
+    <tr><td><b>Anonymous black-box simulator</b></td><td>All 25 public games</td><td>8 s/game; 1 s/search plan</td><td><b>2/183 levels · 0.25% RHAE</b></td><td>Legitimate non-zero baseline; blind expansion still hits the depth wall.</td></tr>
+    <tr><td><b>Observation-only online</b></td><td>Three-game smoke test</td><td>5 s/game; 300 real actions</td><td><b>0/19 levels</b></td><td>Portable to a sealed grader, but the current transition graph is far too weak.</td></tr>
+    <tr><td><s>Public answer replay</s></td><td>25 known games</td><td>Stored traces</td><td><s>183/183</s></td><td><span class="badge b-ext">rejected</span> Does not measure private/OOD ability.</td></tr>
+  </table>
+  </div>
+
+  <h3 class="blk">Run and audit</h3>
+  <div class="runbox">.\.venv-arc\Scripts\python.exe -m chat_gpt_5_5.audit
+.\.venv-arc\Scripts\python.exe -m unittest chat_gpt_5_5.test_agent -v
+.\.venv-arc\Scripts\python.exe -m chat_gpt_5_5.evaluate --mode simulator
+.\.venv-arc\Scripts\python.exe -m chat_gpt_5_5.evaluate --mode online</div>
+  <p class="lead" style="margin-top:10px">Architecture and exact claim boundaries:
+    <a href="chat_gpt_5_5/README.md"><code>README.md</code></a>. Experiments, failures, and next steps:
+    <a href="chat_gpt_5_5/RESEARCH_LOG.md"><code>RESEARCH_LOG.md</code></a>. Full per-environment result:
+    <a href="chat_gpt_5_5/BENCHMARK_2026-06-20.md"><code>BENCHMARK_2026-06-20.md</code></a>.</p>
+
+  <h3 class="blk">Why this is still the beginning</h3>
+  <div class="grid g3">
+    <div class="card"><h3>State graphs are necessary</h3><p>They deduplicate cycles and retain transition evidence, but novelty is often orthogonal to the hidden goal.</p></div>
+    <div class="card"><h3>Goal hypotheses are too narrow</h3><p>The current learner covers clear and reach families, not ordering, arithmetic, physics, inventory, or program execution.</p></div>
+    <div class="card"><h3>Next: executable DSL</h3><p>Induce object rules and win predicates, falsify them with targeted probes, then plan over the smallest surviving model.</p></div>
+  </div>
+
+  <div class="callout info" style="margin-top:18px">
+    <div class="em">&#128218;</div>
+    <div>The direction follows the strongest transferable evidence:
+      <a href="https://arxiv.org/abs/2512.24156" target="_blank" rel="noopener">graph-based exploration</a> establishes
+      the brute-force wall; <a href="https://arxiv.org/abs/2605.05138" target="_blank" rel="noopener">executable world
+      models with verification</a> show the promising escape route; scoring is checked against the
+      <a href="https://docs.arcprize.org/methodology" target="_blank" rel="noopener">official RHAE methodology</a>.
+      No method currently justifies a promise to solve every private game.</div>
   </div>
 </section>
 
@@ -772,61 +872,60 @@
 <section class="panel" id="strategy">
   <div class="sectionhead">
     <div class="eyebrow">Section 4</div>
-    <h2>The winning strategy</h2>
-    <p class="lead">Build a general <b>forward-model search agent</b>: segment each frame into objects, clone the live
-      game to get a free exact simulator, search that clone to discover the goal and a near-optimal path, then execute
-      <b>only</b> that path on the scored instance.</p>
+    <h2>Strategy after measurement</h2>
+    <p class="lead">The first thesis&mdash;clone the game and run a universal tree search&mdash;was testable, and it failed
+      at scale. Replacing it with public answers produced a fake improvement, so that path is deleted. For unseen
+      games, the stack must learn executable rules, object-centric state graphs, goal predicates, and bounded plans.</p>
   </div>
 
-  <h3 class="blk">The exploit, in four moves</h3>
+  <h3 class="blk">The working loop, in four moves</h3>
   <div class="grid g4">
-    <div class="card"><h3><span class="ic">&#129528;</span>Segment</h3><p>Connected-component segmentation over the 64&#215;64&#215;16 grid &#8594; objects, the agent token, adjacency &amp; containment.</p></div>
-    <div class="card"><h3><span class="ic">&#128203;</span>Clone</h3><p><code>copy.deepcopy(arc_env._game)</code> &#8594; a perfect, in-process simulator. Steps on the clone are <b>free and unscored</b>.</p></div>
-    <div class="card"><h3><span class="ic">&#127919;</span>Search</h3><p>Search the clone &#8212; novelty for goal discovery, an inferred win-condition heuristic for efficiency &#8212; until a rollout fires <code>levels_completed</code>.</p></div>
-    <div class="card"><h3><span class="ic">&#9889;</span>Execute</h3><p>Run <b>only</b> the discovered near-optimal sequence on the real, scored instance. Nothing else touches the scorecard.</p></div>
+    <div class="card"><h3><span class="ic">&#128214;</span>Recover rules</h3><p>Public: read source. OOD: induce a compact executable transition model from controlled probes and frame diffs.</p></div>
+    <div class="card"><h3><span class="ic">&#129518;</span>Abstract</h3><p>Represent objects, relations, inventory, counters, and subgoals&mdash;not raw pixels or full engine snapshots.</p></div>
+    <div class="card"><h3><span class="ic">&#127919;</span>Plan locally</h3><p>Select algebra, CSP, A*, graph planning, or a short exact search for the mechanic and current subproblem.</p></div>
+    <div class="card"><h3><span class="ic">&#10003;</span>Verify &amp; compile</h3><p>Check progress on the real environment, repair the smallest failing segment, then replay a deterministic macro.</p></div>
   </div>
 
   <div class="callout tip" style="margin-top:18px">
-    <div class="em">&#128161;</div>
-    <div>This is the <b>only</b> paradigm that converts ARC&#8209;AGI&#8209;3's defining obstacle &#8212; "the goal is
-    never told" &#8212; into a <b>checkable</b> objective (detect <code>levels_completed</code> in a rollout), and it
-    attacks <b>both</b> scoring levers at once: completion via search, near-optimal action counts via the exact model.
-    It generalizes to OOD mechanics <b>by construction</b> — it searches the actual rules, so there is nothing to overfit.</div>
+    <div class="em">&#128202;</div>
+    <div><b>Why this changed:</b> an earlier less-restricted cloned-state prototype completed about <b>16/183</b> public
+    levels; the new leakage-audited implementation completed <b>2/183</b> under a short full-suite run. The deleted
+    replay reached 183/183 but supplied no transferable evidence. Exact simulation remains a verifier, not intelligence.</div>
   </div>
 
-  <h3 class="blk">The one decisive fork &#8212; the Day-1 gate</h3>
+  <h3 class="blk">The simulator gate is still useful&mdash;but no longer the thesis</h3>
   <div class="callout warn">
     <div class="em">&#128721;</div>
-    <div>The whole plan hinges on a single unverified fact: <b>does the real Kaggle grader hand us the live
-    <code>_game</code> object to <code>deepcopy</code>, or only a frozen <code>step()</code>?</b> It is
+    <div><b>Check whether the Kaggle grader exposes the live
+    <code>_game</code> object to <code>deepcopy</code>, or only a frozen <code>step()</code>.</b> It is
     <span class="badge b-ok">&#10003;</span> code-verified on the shipped wheels but <span class="badge b-test">&#129514;</span>
-    not yet confirmed on the grader. So Phase 1 is a ~30-line go/no-go probe:
-    <b style="color:var(--green)">GREEN</b> &#8594; forward-model search is the primary engine and the path to 100%.
-    <b style="color:var(--red)">RED</b> &#8594; pivot to the learned-world-model + CNN fallback immediately.
-    <i>Never ship the perfect simulator as the sole engine.</i></div>
+    not yet confirmed on the grader. <b style="color:var(--green)">GREEN</b> makes verification and local search cheaper;
+    <b style="color:var(--red)">RED</b> requires the learned executable model. Neither branch licenses blind global BFS,
+    and neither establishes OOD generalization by itself.</div>
   </div>
 
   <h3 class="blk">What works &#8212; and what doesn't</h3>
   <div class="grid g2">
     <div class="col">
       <h3 class="colh"><span class="dot" style="background:var(--green)"></span>Works (build these)</h3>
-      <div class="item"><div class="t">A · Forward-model planning <span class="badge b-test">fit 82</span></div><div class="d">Env as its own perfect simulator. The primary engine: searches the actual rules, attacks both scoring levers, generalizes by construction.</div></div>
-      <div class="item"><div class="t">B · Object-centric perception + state graph <span class="badge b-ext">6.71%</span></div><div class="d">CC segmentation + canonical frame-hash dedup + dead-end/cycle detection. The supporting front-end (Blind Squirrel-style).</div></div>
-      <div class="item"><div class="t">C · Small local CNN aide <span class="badge b-ext">12.58%</span></div><div class="d">16-ch one-hot &#8594; conv torso + per-action heads + a 64&#215;64 coordinate head. Scores clicks cheaply; the GPU fallback policy if <code>_game</code> is sealed.</div></div>
-      <div class="item"><div class="t">D · Go-Explore / novelty (archive only)</div><div class="d">Return-to-state is exact &amp; free via deepcopy; language-free novelty drives goal discovery. Keep the archive, drop the RL phase.</div></div>
+      <div class="item"><div class="t">A · Anonymous object/state-graph agent <span class="badge b-ok">2/183 measured</span></div><div class="d">The new legitimate baseline: no identity, source, or traces; black-box planning plus an observation-only fallback.</div></div>
+      <div class="item"><div class="t">B · Executable world model + verifier <span class="badge b-ext">15/25 external</span></div><div class="d">The strongest bridge toward OOD: infer runnable rules, generate plans, and reject models that fail held-out transitions.</div></div>
+      <div class="item"><div class="t">C · Object-centric state graph <span class="badge b-ext">122/183 external</span></div><div class="d">Objects, canonical hashes, reversible probes, and dead-end detection provide a robust exploration substrate.</div></div>
+      <div class="item"><div class="t">D · Bounded exact search &amp; macro synthesis</div><div class="d">Use BFS/A* only inside a small symbolic subproblem; compile successful paths so the scored run stays short.</div></div>
     </div>
     <div class="col">
       <h3 class="colh"><span class="dot" style="background:var(--red)"></span>Doesn't work (avoid)</h3>
       <div class="item"><div class="t">Pure LLM / VLM agents <span class="badge b-ext">&lt;1%</span></div><div class="d">Mechanically impossible offline, empirically dead at the frontier, and the bottleneck is search not perception. Real-world linguistic priors actively mislead on abstract grids.</div></div>
-      <div class="item"><div class="t">Learned world models (Dreamer/MuZero) <span class="badge b-test">fit 18</span></div><div class="d">Why approximate the transition function when <code>deepcopy</code> <i>is</i> it? Sample-hungry; model error is fatal under squared efficiency.</div></div>
+      <div class="item"><div class="t">Blind global BFS over engine snapshots</div><div class="d">Measured at roughly 16/183 levels. Deep horizons, click branching, and irrelevant state make exact transitions computationally useless without abstraction.</div></div>
       <div class="item"><div class="t">Model-free deep RL (PPO/DQN/&#8230;) <span class="badge b-test">fit 8</span></div><div class="d">Needs 10&#8309;&#8211;10&#8312; steps vs a tens-to-hundreds single-life budget; every learning step burns scored actions; no reward to bootstrap.</div></div>
-      <div class="item"><div class="t">Overfitting the 25 public games</div><div class="d">The dominant trap. Solution-level handcrafting scores 0 on siblings; only engine-level generality transfers.</div></div>
+      <div class="item"><div class="t">Calling public coverage "general intelligence"</div><div class="d">The new solver intentionally overfits the public source. It is valuable test infrastructure, but private transfer must be measured separately.</div></div>
     </div>
   </div>
 
   <h3 class="blk">Algorithm ranking</h3>
-  <p class="lead" style="margin-bottom:14px">Decisive but conditional on the Day-1 fact. The stack is designed so each
-    engine degrades gracefully into the next. <span style="color:var(--txt3)">"Fit" = the team's 0&#8211;100 suitability score.</span></p>
+  <p class="lead" style="margin-bottom:14px">Ranked from the new evidence. Public-set performance and OOD potential are
+    different axes; the role column makes that boundary explicit. <span style="color:var(--txt3)">"Fit" = the team's
+    current 0&#8211;100 suitability score.</span></p>
   <div id="ranks"></div>
 
   <div class="callout info" style="margin-top:22px">
@@ -841,17 +940,17 @@
 <section class="panel" id="plan">
   <div class="sectionhead">
     <div class="eyebrow">Sections 4&#8211;5</div>
-    <h2>Baselines &amp; execution plan</h2>
-    <p class="lead">An executable build order. Each baseline is useful alone <b>and</b> becomes a reusable component of
-      the winning stack. Build in order; each gates the next.</p>
+    <h2>Baselines &amp; next research plan</h2>
+    <p class="lead">The answer-replay ceiling has been discarded. The research question is now measured directly:
+      can the agent induce executable rules, falsify them cheaply, and plan without public source, identity, or traces?</p>
   </div>
 
   <h3 class="blk">The baselines (B&#8722;1 &#8594; B3)</h3>
   <div class="grid g2">
     <div class="card" style="border-color:rgba(245,205,91,.35)"><h3><span class="ic">&#128270;</span>B&#8722;1 · Simulability probe</h3>
-      <p><b>Day 1, before any planner code.</b> ~30 lines: <code>deepcopy</code> the game, step the copy, assert the
+      <p><b>Infrastructure check, not a strategy fork.</b> <code>deepcopy</code> the game, step the copy, assert the
       original frame &amp; scorecard are unchanged, verify two clones stay byte-identical. Run on all 25 games.
-      <b>Resolves the GREEN/RED fork.</b></p></div>
+      This determines which verification tools are available.</p></div>
     <div class="card"><h3><span class="ic">&#127922;</span>B0 · Random sanity agent</h3>
       <p>End-to-end plumbing: load each env in OFFLINE mode, drive the loop, read <code>FrameData</code>, compute local
       RHAE. <b>Critical fix:</b> raise the dangerous <code>MAX_ACTIONS=80</code> default to per-level <code>5&#183;h</code>.
@@ -861,23 +960,21 @@
       instead of 4096 raw clicks; no-op detection by frame equality. The perception substrate every later baseline
       reuses; the mandatory fallback if the probe fails.</p></div>
     <div class="card"><h3><span class="ic">&#127795;</span>B2 · Forward-model BFS / IDDFS</h3>
-      <p>The core thesis in code: deepcopy the game, search until a rollout ticks <code>levels_completed</code>, execute
-      only that path. Near-cap RHAE on narrow-branch games. <b>The big jump.</b> Provably stalls on depth-~400 levels
-      &#8594; why B3 exists.</p></div>
-    <div class="card" style="grid-column:1/-1;border-color:rgba(45,212,191,.35)"><h3><span class="ic">&#127919;</span>B3 · Best-first search + learned win-condition detection</h3>
-      <p>Defeats the depth wall + sparse reward. A <b>heuristic = inferred win-condition distance</b> (pixel-match,
-      pose-match, or reach-match, auto-detected per frame &#8212; never hardcoded) plus <b>subgoal decomposition</b> turns
-      one ~400-deep search into many &#8804;30-deep ones. Reuses B1's perception, B2's free simulator, and a tiny
-      classifier that learns which on-screen object is the target. <b>The credible path to 100% on simulable envs.</b></p></div>
+      <p><span class="badge b-ext">measured failure</span> The first implementation reached only about
+      <b>16/183 levels</b>. Retain it as a local subproblem solver and regression baseline, not the global engine.</p></div>
+    <div class="card" style="grid-column:1/-1;border-color:rgba(45,212,191,.35)"><h3><span class="ic">&#127919;</span>B3 · Executable world model + verifier</h3>
+      <p>Induce a small program for state transitions and the win predicate from controlled probes. Falsify every
+      candidate on held-out transitions, plan over symbolic state, and invoke exact search only for short unresolved
+      macros. This is the highest-potential OOD direction found in the research.</p></div>
   </div>
 
   <h3 class="blk">The six winning ideas</h3>
   <div class="grid g3">
-    <div class="card"><h3>1 · Perfect-simulator planner</h3><p>Treat <code>_game</code> as its own oracle; search on free deepcopies, execute the near-optimal path. Highest-ceiling idea; load-bearing on the Day-1 probe.</p></div>
-    <div class="card"><h3>2 · General win-condition inference</h3><p>Never read the obfuscated source. Infer the goal from <code>levels_completed</code> + frame-diff; classify the env's match-type and plug the right heuristic.</p></div>
+    <div class="card"><h3>1 · Anonymous evaluation gate</h3><p>Construct the policy without an environment identity and fail CI if source readers, public IDs, traces, or fixed policies cross the boundary.</p></div>
+    <div class="card"><h3>2 · Executable rule induction</h3><p>Infer transition programs and win predicates from probes; prefer the smallest model that predicts held-out effects.</p></div>
     <div class="card"><h3>3 · Object-centric abstraction</h3><p>Plan in object space, not pixels. Collapses branching, supplies the canonical hash for cycle detection, encodes the only priors the games use.</p></div>
-    <div class="card"><h3>4 · Click-target pruning</h3><p>Reconstruct the never-exposed clickable oracle: propose clicks only at object centroids, validate on the simulator. 4096 &#8594; a handful.</p></div>
-    <div class="card"><h3>5 · Action-effect CNN</h3><p>GPU heuristic that orders candidate actions/clicks &#8212; and the primary engine if the probe fails. Trains online per env; no VLM.</p></div>
+    <div class="card"><h3>4 · Falsification loop</h3><p>Choose probes that distinguish competing rule hypotheses; reject any world model that misses a held-out transition.</p></div>
+    <div class="card"><h3>5 · Local search &amp; macros</h3><p>Use BFS/A* after abstraction, inside a bounded subproblem. Cache successful paths as semantic macro-actions.</p></div>
     <div class="card"><h3>6 · Level-to-level transfer</h3><p>Later levels compose earlier mechanics and carry the most weight. Cache the win-model, object taxonomy, and macro-actions; reapply forward.</p></div>
   </div>
 
@@ -888,13 +985,13 @@
   <div class="scrollx">
   <table class="tbl">
     <tr><th>#</th><th>Risk</th><th>L / I</th><th>Mitigation</th></tr>
-    <tr><td class="num">R1</td><td><b>Grader hides <code>_game</code></b> (frozen/remote step) &#8212; kills perfect-sim</td><td class="num">Med / Crit</td><td>Phase-1 RED fork pre-built (cached world-model + CNN behind a flag); re-verify on the real image ASAP</td></tr>
-    <tr><td class="num">R2</td><td>Organizers patch deepcopy / second-instance between versions</td><td class="num">Med / Crit</td><td>Use deepcopy-of-live-object (&#8800; re-instantiation); keep the RED fallback live; track wheel releases</td></tr>
+    <tr><td class="num">R1</td><td><b>Public solver is mistaken for OOD progress</b></td><td class="num">High / Crit</td><td>Separate public coverage from holdout metrics in code, docs, and every report</td></tr>
+    <tr><td class="num">R2</td><td>Induced executable rules fit observed probes but are wrong</td><td class="num">High / Crit</td><td>Counterexample-guided synthesis; reserve held-out transitions; minimum-description prior</td></tr>
     <tr><td class="num">R3</td><td>Hidden/global RNG in OOD envs breaks deepcopy/replay</td><td class="num">Med / High</td><td>Unconditional <code>np.random</code>/<code>random</code> save-restore guard; deepcopy-only; adversarial synthetic tests</td></tr>
     <tr><td class="num">R4</td><td>Search horizon explosion (baselines &#8594; 578, 4096 clicks)</td><td class="num">High / High</td><td>Subgoal decomposition, macro-actions, learned heuristics/click proposer, time governor &#8594; best-partial</td></tr>
     <tr><td class="num">R5</td><td>Public-overfit fails to transfer to the private OOD set</td><td class="num">High / High</td><td>Holdout-7 gate, constant-hunt audit, mechanic-family ablation; engine-level generality only</td></tr>
     <tr><td class="num">R6</td><td>9 h compute overrun</td><td class="num">Med / High</td><td>Time governor, incremental save/restore instead of full deepcopy in hot loops, per-env caps, checkpointed best-so-far</td></tr>
-    <tr><td class="num">R7</td><td>Offline DL packaging fails (no torch in the wheels)</td><td class="num">Med / Med</td><td>Prefer a pure-numpy proposer when GREEN; else pin a CUDA wheel to the exact image and rehearse import offline</td></tr>
+    <tr><td class="num">R7</td><td>Offline DL packaging fails (no torch in the wheels)</td><td class="num">Med / Med</td><td>Keep the core symbolic stack pure Python/NumPy; make neural proposal modules optional</td></tr>
   </table>
   </div>
 
@@ -913,9 +1010,9 @@
 
   <div class="callout tip" style="margin-top:18px">
     <div class="em">&#9201;&#65039;</div>
-    <div><b>Critical-path summary:</b> Day-1 Phase 1 decides everything. GREEN &#8594; Jun 30 is a search-agent banking
-    exercise and Sep 30 is a generalization + completion push toward 100%. RED &#8594; re-scope to the
-    learned-world-model fallback on Day 1 and treat Milestone #1 as its proving ground.</div>
+    <div><b>Critical-path summary:</b> keep the leakage audit and anonymous 2/183 baseline frozen, then score every new
+    idea on source-hidden mechanic holdouts. Promote only modules that predict unseen transitions or improve completion
+    without game IDs, source constants, or stored traces.</div>
   </div>
 </section>
 
@@ -925,6 +1022,12 @@
   <div class="hero">
     <span class="tag">SJSU CMPE 295A · Group 2 · 2026‑06‑19</span>
     <h1>Strategy &amp; Algorithm<br>Comparison and Ranking</h1>
+    <div class="callout warn" style="margin-top:18px;text-align:left">
+      <div class="em">&#8635;</div>
+      <div><b>Historical snapshot:</b> this comparison predates the 2026-06-20 implementation result. Its original
+      rankings are preserved for traceability; the current recommendation and measured benchmark are in
+      <a href="#" data-goto="solver">Honest Agent</a> and <a href="#" data-goto="strategy">Strategy</a>.</div>
+    </div>
     <p>Four strategy documents, one rubric: ranked head‑to‑head, then every algorithm merged into a unified master ranking.</p>
     <p class="crumb"><a href="#" data-goto="strategy">▶ Master Plan: Strategy</a> &nbsp;·&nbsp; <a href="#" data-goto="overview">Overview</a> &nbsp;·&nbsp; <a href="https://www.kaggle.com/competitions/arc-prize-2026-arc-agi-3">Kaggle ↗</a></p>
     <nav class="toc">
@@ -985,7 +1088,7 @@
         <tr><td><strong>Finds deepcopy exploit?</strong></td><td><span class="badge b-s">Yes — the spine</span></td><td><span class="badge b-d">No</span></td><td><span class="badge b-c">Partial</span></td><td><span class="badge b-d">No</span></td></tr>
         <tr><td><strong>RHAE / efficiency</strong></td><td>Exact formula; completion‑dominance</td><td>Trace compression noted</td><td>Action‑cost‑aware + trace compression</td><td>Cites RHAE %; no squared‑term engagement</td></tr>
         <tr><td><strong>OOD / anti‑overfit</strong></td><td>Held‑out split + constant‑hunt audit</td><td>Warns synthetic≠private</td><td>Self‑play + meta‑prior</td><td>Aware (StochasticGoose collapse), but meta‑training is OOD‑risky</td></tr>
-        <tr><td><strong>Evidence grounding</strong></td><td>Source‑verified wheels + ✅/🧪/⚠️</td><td>Preview results cited</td><td>arXiv IDs <em>look fabricated</em></td><td><span class="win">Best landscape</span>: real leaderboard + ARC‑AGI‑2 lineage</td></tr>
+        <tr><td><strong>Evidence grounding</strong></td><td>Source‑verified wheels + ✅/🧪/⚠️</td><td>Preview results cited</td><td>arXiv IDs <em>verified real (2026‑06)</em></td><td><span class="win">Best landscape</span>: real leaderboard + ARC‑AGI‑2 lineage</td></tr>
         <tr><td><strong>Risk analysis</strong></td><td>9‑row register + Day‑1 gate</td><td>Light</td><td>Per‑algo notes</td><td>None (scoping plan)</td></tr>
       </tbody>
     </table>
@@ -1000,7 +1103,7 @@
       <div class="mini"><h4>✗ What each gets wrong</h4><ul>
         <li><strong>master_plan:</strong> everything pivots on the deepcopy assumption holding on the <em>real</em> grader (mitigated by the Day‑1 probe + RED fallback).</li>
         <li><strong>plan_1:</strong> frames the core as "learn a transition model" — misses that the exact model is free.</li>
-        <li><strong>plan_2:</strong> rebuilds a simulator a coding agent must verify — offline‑fragile, dominated by deepcopy; shaky citations.</li>
+        <li><strong>plan_2:</strong> rebuilds a simulator a coding agent must verify — offline‑fragile, dominated by deepcopy. (Its arXiv citations are in fact real — verified 2026‑06.)</li>
         <li><strong>research:</strong> earliest‑stage; misses the exploit; barely engages the squared metric.</li>
       </ul></div>
     </div>
@@ -1032,7 +1135,7 @@
     <h3>🥈 2. plan_1 — 63/100 · the scaffold</h3>
     <p>The best self‑contained external list. Right instincts (state graph + exploration on top, LLM as router only), preview‑aligned, clean phased build. Blind spot: the free simulator.</p>
     <h3>🥉 3. plan_2 — 65/100 · the parts bin</h3>
-    <p>Most thorough and the best module source. Demoted below plan_1 on alignment: its headline executable‑world‑model loop is offline‑fragile and dominated by the free simulator, and its citations are untrustworthy.</p>
+    <p>Most thorough and the best module source. Demoted below plan_1 on alignment: its headline executable‑world‑model loop is offline‑fragile and dominated by the free simulator. <em>Correction (2026‑06): a web check confirms its arXiv citations are real — its evidence grounding was underrated.</em></p>
     <h3>4. research — 60/100 · the best to merge</h3>
     <p>The best‑researched document, but an earlier‑stage scoping note that misses the exploit and barely engages the exact metric — hence 4th as a self‑contained strategy. <strong>Yet it is the #1 document to merge</strong>: its executable‑world‑model + falsification program is the best available blueprint for the RED branch where the Master Plan is thin.</p>
   </section>
@@ -1109,7 +1212,7 @@
       <br><em>Proves:</em> learned exploration <b>overfits and does not generalize</b> to the private OOD set — a direct vindication of the Master Plan's "search the actual rules, nothing to overfit," and a warning against research's own synthetic‑meta‑training bet.
     </div>
     <div class="callout green">
-      <strong>SingularityNET executable world model: 15/25 solved, 58.12% mean RHAE.</strong> The strongest publicly reported ARC‑AGI‑3 result — a world‑model refinement loop, no deepcopy exploit.
+      <strong>SingularityNET executable world model: 58.12% mean RHAE, 15/25 solved</strong> (v2, GPT‑5.5; v1 was 32.58%, 7/25, GPT‑5.4). The strongest publicly reported ARC‑AGI‑3 result — a verifier‑driven Python world model, no deepcopy exploit.
       <br><em>Proves:</em> the "honest path" can go far, so research's direction is credible — <b>but</b> it ran on a hosted frontier API (not Kaggle‑eligible) and is public‑only. Where deepcopy works, the Master Plan still dominates it; where it doesn't, this is the bar to beat offline.
     </div>
 
@@ -1296,8 +1399,8 @@
 
   <h2>The 4 most important takeaways from this folder</h2>
   <div class="grid">
-    <div class="card"><h3><span class="ic">&#128268;</span>Offline = LLMs are dead</h3><p>The entire <span class="mono">templates/</span> folder calls external APIs (OpenAI…). With <b>no internet</b> at eval, drop them; keep only the framework in <span class="mono">agent.py</span>.</p></div>
-    <div class="card"><h3><span class="ic">&#129518;</span>Game = perfect simulator</h3><p>The <span class="mono">_game</span> object lives in RAM &rarr; you can <span class="mono">deepcopy</span> it to try moves <b>for free</b>, find the optimal solution, then play for real.</p></div>
+    <div class="card"><h3><span class="ic">&#128268;</span>External APIs are unavailable</h3><p>The templates call hosted APIs. The submission must run offline; a packaged local model is possible, but the core agent cannot depend on network calls.</p></div>
+    <div class="card"><h3><span class="ic">&#129518;</span>Simulator access is conditional</h3><p>A clone can provide black-box <span class="mono">step/observe</span> experience if the grader exposes it. It improves search capacity but does <b>not</b> reveal the goal or make deep search tractable.</p></div>
     <div class="card"><h3><span class="ic">&#9888;</span>MAX_ACTIONS = 80 is too low</h3><p>The template default allows only 80 moves; real games need up to <b>578</b>. Raise it to the rule's <span class="mono">5&times;h</span>.</p></div>
     <div class="card"><h3><span class="ic">&#128272;</span>Game code is obfuscated</h3><p>Variable names in <span class="mono">&lt;id&gt;.py</span> are randomized &mdash; <b>you can't read the rules</b>; the agent must learn by playing. These 25 games are for practice, not memorization.</p></div>
   </div>
@@ -1435,14 +1538,14 @@ updateLevel(); updateEnv();
 
 /* ---------- algorithm ranking ---------- */
 const RANKS=[
-  {r:1,nm:'Forward-model tree/graph search',sub:'deepcopy = perfect simulator · BFS / IDA* / best-first / MCTS',role:'Primary engine (if Day-1 _game access)',fit:82,c:'var(--teal)'},
-  {r:2,nm:'Small local CNN perception',sub:'action-effect + 64×64 coordinate head, segmenter, frame-diff',role:'Perception aide; fallback policy if _game sealed',fit:42,c:'var(--blue)'},
-  {r:3,nm:'Go-Explore + novelty exploration',sub:'cell archive, return-to-state, RND, frame-change reward',role:'Exploration substrate feeding search',fit:38,c:'var(--violet)'},
-  {r:4,nm:'Neuro-symbolic object-centric + state graph',sub:'CC segmentation, canonical hash, dead-end prune',role:'State-abstraction front-end',fit:38,c:'var(--violet)'},
-  {r:5,nm:'Program/DSL synthesis & win-predicate induction',sub:'induce the win condition, not the dynamics',role:'Symbolic goal-induction module only',fit:34,c:'var(--amber)'},
-  {r:6,nm:'Learned world models',sub:'DreamerV3 / MuZero / IRIS, test-time',role:'Thin contingency fallback',fit:18,c:'var(--red)'},
-  {r:7,nm:'Meta-RL / in-context RL',sub:'RL², AMAGO, RELIC, Algorithm Distillation',role:'Not recommended; at most a move-order prior',fit:18,c:'var(--red)'},
-  {r:8,nm:'Model-free deep RL',sub:'PPO, DQN/Rainbow, IMPALA, R2D2',role:'Not recommended; offline-distilled prior at most',fit:8,c:'var(--red)'},
+  {r:1,nm:'Executable world model + verifier',sub:'induce runnable rules · test predictions · repair counterexamples',role:'Primary OOD research direction',fit:82,c:'var(--blue)'},
+  {r:2,nm:'Program / DSL synthesis',sub:'mechanic hypotheses · win-predicate induction · minimum-description prior',role:'World-model representation layer',fit:68,c:'var(--teal)'},
+  {r:3,nm:'Object-centric state graph',sub:'objects · relations · canonical hash · dead-end prune',role:'Implemented exploration substrate',fit:58,c:'var(--violet)'},
+  {r:4,nm:'Bounded exact search + macro synthesis',sub:'BFS / A* inside small symbolic subproblems only',role:'Implemented local planner',fit:52,c:'var(--amber)'},
+  {r:5,nm:'Anonymous online effect learner',sub:'frame change · UCB · cross-level goal hypotheses',role:'Implemented portable fallback',fit:34,c:'var(--amber)'},
+  {r:6,nm:'Small local CNN perception',sub:'action-effect ordering · click proposal · frame segmentation',role:'Optional perception and move-order aide',fit:25,c:'var(--violet)'},
+  {r:7,nm:'Go-Explore + novelty archive',sub:'reversible probes · state archive · frame-change reward',role:'Fallback exploration policy',fit:22,c:'var(--red)'},
+  {r:8,nm:'Model-free deep RL',sub:'PPO · DQN/Rainbow · IMPALA · R2D2',role:'Not recommended for single-life OOD',fit:8,c:'var(--red)'},
 ];
 const ranksEl=document.getElementById('ranks');
 RANKS.forEach(x=>{
@@ -1458,14 +1561,14 @@ RANKS.forEach(x=>{
 
 /* ---------- phases ---------- */
 const PHASES=[
-  {n:'0',t:'Offline harness & test rig',w:'Days 0–5',d:'Build the offline venv from the bundled wheels (no network/DL imports), instantiate envs in OFFLINE mode, raise MAX_ACTIONS to 5·h, re-implement the RHAE scoring rig, wire Playback for a 100% sanity check, and freeze an 18-dev / 7-holdout generalization split.',e:'All 25 load + step offline; rig reproduces Playback 100%; holdout frozen.'},
-  {n:'1',t:'DAY-1 critical experiment',w:'Day 1',d:'The go/no-go gate. Verify scorecard isolation, deepcopy determinism, replay divergence (expected to fail on lf52), and an RNG/IO audit with an unconditional save-restore guard. Lock GREEN / YELLOW / RED.',e:'GREEN → forward-model search is primary; RED → pivot to learned world-model + CNN now.'},
-  {n:'2',t:'Explorer: goal discovery',w:'Weeks 2–4',d:'Object-centric perception (CC segmentation), directed state-graph explore-and-prune with canonical-hash dedup, a dense reward oracle from the simulator, and no-op / dead-end detection by frame equality.',e:'Explorer reaches WIN on ≥1 level of every dev game + ≥1 holdout via interaction only.'},
-  {n:'3',t:'Planner: search-then-execute',w:'Weeks 4–7',d:'Engine selection by horizon (BFS/IDDFS → best-first/A* → MCTS), heuristics derived from perception (not hardcoded), subgoal decomposition & macro-actions to tame depth, a compute-bounded search with best-partial fallback, and minimal execution.',e:'≥80% of dev-game levels completed end-to-end at ≤ baseline counts; measurable holdout completion.'},
-  {n:'4',t:'Perception & world-model fallback',w:'Weeks 6–9',d:'A local CNN action-effect/click proposer (online per game), a learned deterministic world model as the RED fallback behind a feature flag, an only-if-needed offline GPU torch package, and dropping all VLM ideas.',e:'RED fallback runs end-to-end on ≥1 env; CNN proposer beats random click selection.'},
-  {n:'5',t:'Generalization hardening',w:'Weeks 9–12',d:'A holdout-only promotion gate, a hunt-and-delete pass on env-specific constants, RNG-guard + deepcopy stress tests on adversarial synthetic envs, and a mechanic-family ablation without per-family code.',e:'Holdout-7 completion within a small stable gap of dev-18; zero hardcoded public constants.'},
-  {n:'6',t:'Compute-budget management',w:'Weeks 11–13',d:'A global time governor (~9h / envs×levels), cheap state copy (incremental save/restore of engine state instead of a full deepcopy in hot loops), score-leverage allocation toward late levels, per-env caps, and checkpointed best-so-far.',e:'Full dry-run over 25 public envs completes within margin.'},
-  {n:'7',t:'Submission packaging & open-source',w:'Weeks 12–13',d:'An offline notebook installing --no-index from bundled wheels, a self-contained OFFLINE harness, deterministic global seeding, a CC0/MIT-0 license, and an end-to-end rehearsal before each milestone.',e:'Notebook runs offline start-to-finish under budget, scores via the rig, license present.'},
+  {n:'0',t:'Enforce the anonymous policy boundary',w:'Done · 2026-06-20',d:'Delete the trace cache and fixed policies. Add a fail-closed audit for public IDs, source readers, answer files, and identity-dependent constructors. Record the honest 2/183 baseline.',e:'Audit and five tests pass; one command reproduces the 0.25% anonymous result.'},
+  {n:'1',t:'Build source-hidden mechanic splits',w:'Days 1–3',d:'Partition mechanics, transformations, and levels so rule-induction code cannot see source, game IDs, or compiled traces. Add adversarial synthetic variants that break coordinate and color constants.',e:'Every OOD experiment has a leakage audit and a frozen holdout score.'},
+  {n:'2',t:'Object-centric probe engine',w:'Week 1',d:'Segment objects and relations, generate reversible low-risk probes, record transition tuples, and maintain a canonical state graph with no-op, cycle, and dead-end detection.',e:'Compact transition datasets and stable object identities across every public mechanic family.'},
+  {n:'3',t:'Executable rule induction',w:'Weeks 2–4',d:'Synthesize compact transition programs and candidate win predicates. Prefer minimum-description models and keep multiple hypotheses when observations are ambiguous.',e:'Predicts held-out action effects substantially above frame-copy and nearest-neighbor baselines.'},
+  {n:'4',t:'Counterexample-guided verifier',w:'Weeks 4–6',d:'Choose probes that maximally distinguish surviving models, replay predicted transitions when a simulator is available, and repair the smallest rule responsible for a mismatch.',e:'Model error falls monotonically on hidden transitions; false confidence is explicitly measured.'},
+  {n:'5',t:'Symbolic planner + local macros',w:'Weeks 5–8',d:'Plan over inferred objects and subgoals. Dispatch algebra, CSP, A*, or bounded BFS per subproblem and compile successful action sequences into reusable semantic macros.',e:'Completion improves over graph exploration without increasing leakage or exceeding action budgets.'},
+  {n:'6',t:'Generalization and budget hardening',w:'Weeks 8–11',d:'Run mechanic-family ablations, delete environment-specific constants, enforce the nine-hour governor, and allocate exploration according to completion-weighted score leverage.',e:'Stable gains on untouched holdouts with a reproducible compute and action budget.'},
+  {n:'7',t:'Offline submission packaging',w:'Weeks 11–13',d:'Package the source-hidden agent and optional local models with no network dependency, deterministic seeds, checkpoints, provenance, and a CC0/MIT-0 release path.',e:'Notebook runs offline end-to-end; public oracle remains test-only and cannot enter the submission path.'},
 ];
 const phEl=document.getElementById('phases');
 PHASES.forEach((p,i)=>{
@@ -1545,7 +1648,7 @@ PHASES.forEach((p,i)=>{
     gamepy:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/&lt;id&gt;.py",badge:["game","Game code (obfuscated)"],title:"&lt;id&gt;.py &mdash; the game's code",
       p:"An <span class='mono'>ARCBaseGame</span> subclass: sprites, levels, camera, and the logic for handling actions + win conditions.",
       li:["⚠️ <b>Variable names are obfuscated</b> (random strings) &mdash; deliberately, so you can't read the rules directly.","The agent must <b>infer</b> the goal by playing and watching when <span class='mono'>levels_completed</span> rises.","Most (23/25) are deterministic with no RNG. Exceptions: <span class='mono'>tr87</span> uses a per-level <b>seeded</b> RNG (reproducible); <span class='mono'>lf52</span> shuffles once with global <b>unseeded</b> <span class='mono'>np.random</span> at construction &rarr; prefer <span class='mono'>deepcopy</span> over re-instantiation."],
-      box:["note","Because the game is deterministic &amp; in RAM, we turn it into a &ldquo;perfect simulator&rdquo; to find the optimal solution before playing for real."]},
+      box:["note","Treat any clone only as a capability-limited black-box simulator. The policy must not inspect source, object fields, IDs, or hidden click oracles; observation-only mode remains mandatory."]},
     metadata:{path:"environment_files/&lt;id&gt;/&lt;ver&gt;/metadata.json",badge:["game","Game metadata"],title:"metadata.json &mdash; the accompanying info",
       p:"A short description of the game.",
       li:["<b>default_fps</b> &mdash; the frame rate.","<b>tags</b> &mdash; control type: keyboard / click / keyboard_click.","<b>baseline_actions</b> &mdash; the per-level baseline move count (≈ the human count h); ranges from <b>6</b> to <b>578</b> across the 25 games."],
