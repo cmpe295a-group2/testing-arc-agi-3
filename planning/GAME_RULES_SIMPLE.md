@@ -36,8 +36,9 @@ moves you used vs a human**.
 
 For **each level you beat:**
 ```
-level_score = (human's moves  /  agent's moves)²      (capped at 1.0 = 100%)
+level_score = (human's moves  /  agent's moves)²      (capped at 1.15 = 115%)
 ```
+*(The engine caps a level at 115%, i.e. you can score slightly over 100% by using fewer moves than the human — verified in `scorecard.py`. The Kaggle page's "cap 1.0" is a simplification.)*
 The three layers stack up like this:
 ```
 LEVEL score = (human moves / agent moves)²        ← per level, 0 to 1

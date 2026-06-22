@@ -49,7 +49,7 @@ What this proves:
 - Agent receives **frames = JSON** (grid ≤ 64×64, values 0–15, (0,0) top-left) + metadata; replies with actions. States: NOT_FINISHED / WIN / GAME_OVER.
 - **Actions:** RESET, ACTION1–5 (simple), ACTION6 (needs x,y), ACTION7 (extra simple). Meaning differs per game → must be discovered by exploration.
 - **Private set = 110 games the agent has NEVER seen; half → Public LB, half → Private LB** (≈55/55). The 25 `environment_files/` games are **dev only** (not scored).
-- **Scoring:** per-level `= min(human_actions/agent_actions, 1.0)²` (cap **1.0**, i.e. 100% — note: our older notes said 1.15; the Kaggle metric caps at 1.0); per-game = level-index-weighted average; total = average over games; **0–100%**, completion-dominated.
+- **Scoring (verified in the wheel):** `scorecard.py:170-171` computes per-level `score = ((baseline/actions)² × 100)` then `min(score, 115.0)` → **cap = 115 (1.15)**, NOT 1.0. The Kaggle Data-tab prose ("min ratio 1.0") is a simplification; the bundled engine allows >100% on a level if you beat the human's action count. Per-game capped at `max_weights/total_weights×100` (`scorecard.py:205`); level weight = level index; total = average over games. (Residual uncertainty: the gateway *could* run an updated scorecard, but the bundled one is the best evidence → use 1.15. Barely matters — the cap only bites when you beat the human, which is rare; completion dominates.)
 - Agent contract: `is_done(frames, latest_frame)`, `choose_action(frames, latest_frame)`. A **Swarm** runs agent instances across all games in parallel. Lifecycle: get games from API → open scorecard → RESET + act per game → close scorecard.
 
 ---
