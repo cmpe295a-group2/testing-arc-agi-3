@@ -26,7 +26,7 @@
   code{font-family:ui-monospace,Consolas,monospace;font-size:.86em;background:var(--code);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:12px 0}
   .card.hero{border-color:var(--teal);background:linear-gradient(180deg,#0f1b22,#0f1420)}
-  .card.vn{border-color:var(--amber);background:#171307}
+  .card.summary{border-color:var(--amber);background:#171307}
   .card.deadend{border-color:#432;background:#151016}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -100,11 +100,11 @@ companion notebook: <code>duck-mods-v2-experiments.ipynb</code></p>
 <!-- ================================ TAB 1 ================================ -->
 <section class="page" id="tab-challenge">
 
-<div class="card vn">
-<b>🇻🇳 Tóm tắt nhanh:</b> ARC-AGI-3 là cuộc thi cho AI <i>tự chơi game ẩn</i> — không ai nói luật, không ai nói mục tiêu.
-AI nhìn màn hình (lưới 64×64), bấm phím/chuột, tự đoán luật chơi và phải thắng bằng <i>ít thao tác nhất</i>.
-Con người đạt ~100 điểm; AI giỏi nhất thế giới trên Kaggle mới đạt <b>1.40</b>. Đội mình fork bản 1.21 của Tufa Labs,
-thêm cải tiến (tab 4) và nộp bài mỗi ngày để chạm/vượt 1.4 (tab 5).
+<div class="card summary">
+<b>⚡ Quick Summary:</b> ARC-AGI-3 is a competition where AI must <i>play hidden video games</i> — no rules, controls, or goals are explicitly given.
+The AI observes a 64×64 grid, performs keyboard/mouse actions, infers the game mechanics, and must win using the <i>fewest actions possible</i>.
+Humans score ~100; the world's best AI on Kaggle has only reached <b>1.40</b>. Our team forked Tufa Labs' 1.21 baseline,
+added improvements (tab 4), and submits daily entries to reach or exceed 1.4 (tab 5).
 </div>
 
 <h2>What is this competition?</h2>
