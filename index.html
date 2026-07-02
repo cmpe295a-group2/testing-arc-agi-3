@@ -330,7 +330,10 @@ rare lucky runs. So there are exactly two levers: <b>raise the average</b> (more
 <h2>Our fix — DUCK MODS v2</h2>
 <p>Implemented in <code>duck-mods-v2-experiments.ipynb</code> (this repo) as defensive in-notebook monkeypatches:
 Tufa's datasets stay untouched, any failed patch falls back to stock behavior, and <code>EXPERIMENT="stock"</code>
-reproduces their notebook exactly.</p>
+reproduces their notebook exactly. A sibling notebook, <code>duck-local-runner.ipynb</code>, runs the same
+experiments <b>on your own machine</b> against the 25 public games — via OpenRouter, Hugging Face Inference
+Providers, or any local OpenAI-compatible server (LM Studio / Ollama / vLLM) — so presets can be A/B-tested
+without burning Kaggle submissions.</p>
 
 <div class="card hero">
 <h3 style="margin-top:0">Mod 1 · Stall restart — turn dead time into extra tries</h3>
@@ -404,9 +407,9 @@ before the LB score lands.</p>
 smoke test plays the 25 public games and prints <code>[duck-mods] applied…</code> + restart telemetry.</li>
 <li><b>Submit — every single day.</b> Skipped days are lottery tickets thrown away. Log every score in the
 notebook's section 9 table.</li>
-<li><b>A/B off-Kaggle:</b> multi-seed comparisons run cheaply on the public games via Tufa's
-<a href="https://github.com/Tufalabs/duck-harness">GitHub repo</a> + OpenRouter. σ per pass ≈ 0.45 → never
-conclude from one run; promote a config only after it wins over ≥5 seeds.</li>
+<li><b>A/B off-Kaggle:</b> multi-seed comparisons run cheaply on the public games with
+<code>duck-local-runner.ipynb</code> (OpenRouter / Hugging Face / local LLM — same experiment names).
+σ per pass ≈ 0.45 → never conclude from one run; promote a config only after it wins over ≥5 passes.</li>
 <li><b>End-game:</b> pick your two best entries for final judging. The final leaderboard uses the <i>other</i>
 50% of hidden games — ±0.2 reshuffles are expected.</li>
 </ol>
